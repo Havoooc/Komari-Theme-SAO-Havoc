@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="keywords"
+      content="Komari-Theme-SAO, SAO, server monitor, real-time server status, server performance dashboard, monitoring tool" />
+    <meta name="theme-color" content="#f4f5f7" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Komari-Theme-SAO" />
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
+    <link rel="apple-touch-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.ico" />
+    <meta property="og:title" content="Komari-Theme-SAO" />
+    <meta property="og:description" content="A Komari monitor theme." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Komari-Theme-SAO" />
+    <meta name="twitter:description" content="A Komari monitor theme." />
+    <title>Komari-Theme-SAO</title>
+    <meta name="description" content="A Komari monitor theme." />
+    <script>
+      (() => {
+        // 超前核心 API 预加载：利用浏览器解析 HTML 与下载 React Bundle 的网络空档期，提前并发拉取关键数据
+        try {
+          if (typeof window !== "undefined" && typeof fetch === "function") {
+            const search = window.location.search || "";
+            // Mock 纯前端开发预览时跳过预加载，避免打到未启动的本地后端端口并污染首屏
+            let isMock = search.includes("mock=1") || search.includes("mock=true");
+            if (!isMock && !search.includes("mock=0")) {
+              try {
+                const stored = sessionStorage.getItem("komari_dev_mock");
+                isMock = stored
+                  ? stored === "1"
+                  : window.location.port === "5173" ||
+                    window.location.port === "5174" ||
+                    window.location.port === "5175" ||
+                    window.location.hostname === "localhost" ||
+                    window.location.hostname === "127.0.0.1";
+              } catch {
+                isMock = true;
+              }
+            }
+            if (isMock) return;
+
+            const p = window.location.pathname || "/";
+            const dir = p.endsWith("/") ? p : p.substring(0, p.lastIndexOf("/") + 1);
+            const prefix = dir === "/" ? "" : dir.replace(/\/+$/, "");
+            const base = prefix ? prefix : "";
+            const headers = { Accept: "application/json" };
+            const opts = { credentials: "include", headers };
+            const rpcHeaders = { Accept: "application/json", "Content-Type": "application/json" };
+            const rpcPost = (method, params = {}) =>
+              fetch(base + "/api/rpc2", {
+                method: "POST",
+                credentials: "include",
+                headers: rpcHeaders,
+                body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+              })
+                .then((r) => (r.ok ? r.json() : null))
+                .catch(() => null);
+
+            const now = Date.now();
+            const d = new Date(now);
+            d.setHours(0, 0, 0, 0);
+            const todayStartMs = d.getTime();
+            const SEVEN_HOURS_MS = 7 * 60 * 60 * 1000;
+            const queryStartMs = Math.min(todayStartMs, now - SEVEN_HOURS_MS);
+            const startIso = new Date(queryStartMs).toISOString();
+            const endIso = new Date(now).toISOString();
+            const fiveMinutesMs = 5 * 60 * 1000;
+            const maxPoints = Math.max(1, Math.ceil((now - queryStartMs) / fiveMinutesMs));
+
+            const yesterdayMs = todayStartMs - 24 * 60 * 60 * 1000;
+            const yesterdayElapsedMs = now - yesterdayMs;
+            const yesterdayQueryHours = Math.max(24, Math.ceil(yesterdayElapsedMs / (60 * 60 * 1000)));
+
+            window.__EARLY_DATA__ = {
+              public: fetch(base + "/api/public", opts).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+              me: fetch(base + "/api/me", opts).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+              nodes: fetch(base + "/api/nodes", opts).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+              rpc_nodes: rpcPost("common:getNodes"),
+              yesterday_ping: rpcPost("public:getPingMetricStats", {
+                hours: yesterdayQueryHours,
+                task_ids: [1, 2, 3],
+                max_points: 24,
+              }),
+              today_traffic: {
+                startMs: queryStartMs,
+                promise: rpcPost("public:queryMetrics", {
+                  start: startIso,
+                  end: endIso,
+                  metric_keys: ["traffic.up", "traffic.down", "net.out.rate", "net.in.rate"],
+                  max_points: maxPoints,
+                  max_points_by_metric: {
+                    "net.out.rate": maxPoints,
+                    "net.in.rate": maxPoints,
+                  },
+                  aggregation_by_metric: {
+                    "traffic.up": "sum",
+                    "traffic.down": "sum",
+                    "net.out.rate": "max",
+                    "net.in.rate": "max",
+                  },
+                  fill_empty: false,
+                }),
+              },
+            };
+          }
+        } catch {}
+
+        try {
+          const cachedTitle = localStorage.getItem("komaritheme:sitename");
+          if (cachedTitle && cachedTitle.trim()) {
+            document.title = cachedTitle.trim();
+            const setMeta = (sel, val) => {
+              const el = document.querySelector(sel);
+              if (el) el.setAttribute("content", val);
+            };
+            setMeta('meta[name="apple-mobile-web-app-title"]', cachedTitle.trim());
+            setMeta('meta[property="og:title"]', cachedTitle.trim());
+            setMeta('meta[name="twitter:title"]', cachedTitle.trim());
+          }
+          const cachedDesc = localStorage.getItem("komaritheme:description");
+          if (cachedDesc && cachedDesc.trim()) {
+            const setMeta = (sel, val) => {
+              const el = document.querySelector(sel);
+              if (el) el.setAttribute("content", val);
+            };
+            setMeta('meta[name="description"]', cachedDesc.trim());
+            setMeta('meta[property="og:description"]', cachedDesc.trim());
+            setMeta('meta[name="twitter:description"]', cachedDesc.trim());
+          }
+        } catch {}
+        const appearances = new Set(["system", "light", "dark"]);
+        const readAppearance = (key) => {
+          const raw = localStorage.getItem(key);
+          if (raw == null) return null;
+          let value = raw;
+          try {
+            value = JSON.parse(raw);
+          } catch {}
+          if (!appearances.has(value)) return null;
+          const normalized = JSON.stringify(value);
+          if (raw !== normalized) localStorage.setItem(key, normalized);
+          return value;
+        };
+
+        let appearance = "dark";
+        try {
+          appearance = readAppearance("appearance") ?? readAppearance("appearance_default") ?? "dark";
+        } catch {
+          appearance = "dark";
+        }
+        const resolved =
+          appearance === "system"
+            ? window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light"
+            : appearance;
+        document.documentElement.dataset.appearance = resolved;
+        document.documentElement.style.colorScheme = resolved;
+        const isDark = resolved === "dark";
+        const color = isDark ? "#09090b" : "#f4f5f7";
+        document.documentElement.style.backgroundColor = color;
+        const metas = document.querySelectorAll('meta[name="theme-color"]');
+        metas.forEach((el) => el.remove());
+        const meta = document.createElement("meta");
+        meta.name = "theme-color";
+        meta.content = color;
+        document.head.appendChild(meta);
+        const statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+        if (statusMeta) {
+          statusMeta.content = isDark ? "black-translucent" : "default";
+        }
+
+        try {
+          const rawDepth = localStorage.getItem("komaritheme:dark-depth");
+          if (rawDepth != null) {
+            const parsedDepth = Number(rawDepth);
+            const darkDepth = Number.isFinite(parsedDepth)
+              ? Math.min(100, Math.max(0, Math.round(parsedDepth)))
+              : 0;
+            if (darkDepth > 0) {
+              document.documentElement.style.setProperty(
+                "--dark-depth",
+                String(darkDepth),
+              );
+            } else {
+              document.documentElement.style.removeProperty("--dark-depth");
+            }
+          }
+        } catch {}
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/index-Z2oZKY3B.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-Cyuzqnbw.js">
+    <link rel="modulepreload" crossorigin href="/assets/charts-lRTmaCY8.js">
+    <link rel="modulepreload" crossorigin href="/assets/react-BOHBWzdN.js">
+    <link rel="modulepreload" crossorigin href="/assets/query-Cwfy2JVP.js">
+    <link rel="modulepreload" crossorigin href="/assets/createLucideIcon-KuP1sHHk.js">
+    <link rel="modulepreload" crossorigin href="/assets/validation-CFyfFiDm.js">
+    <link rel="modulepreload" crossorigin href="/assets/mediaQuery-8KEgw-ZY.js">
+    <link rel="stylesheet" crossorigin href="/assets/charts-CnsZ1jie.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-Ol0RXH63.css">
+    <link rel="stylesheet" href="/assets/komari-sao-routes.css?v=20261115-6">
+    <script defer src="/assets/komari-sao-routes.js?v=20261115-5"></script>
+      <link rel="stylesheet" href="/assets/komari-sao-heatmap.css?v=20261115-4">
+    <script defer src="/assets/komari-sao-heatmap.js?v=20261115-6"></script>
+  </head>
+  <body>
+    <div id="root" class="relative z-30"></div>
+  </body>
+</html>

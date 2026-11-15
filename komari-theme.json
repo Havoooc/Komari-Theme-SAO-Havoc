@@ -1,0 +1,8 @@
+{
+  "name": "SAO-Havoc",
+  "short": "SAO-Havoc",
+  "description": "Customized SAO theme (routes, traffic heatmap & backup track)",
+  "version": "2.0.0",
+  "author": "Havoc",
+  "preview": "preview.png"
+}
