@@ -40,9 +40,12 @@
     const partialNote = partial ? ' · 末跳未完整响应' : '';
     const timeStr = time ? new Date(time).toLocaleString('zh-CN') : '未知';
     const reasonStr = meta?.reason ? `；${meta.reason}` : '';
+    const SHORT_MAP = { '国内电信': '直连电信', '国内联通': '直连联通', '国内移动': '直连移动' };
+    const displayVal = SHORT_MAP[value] || value;
+    const isTight = (/[\u4e00-\u9fa5]/.test(displayVal) && displayVal.length >= 4) || displayVal.length >= 5;
     return [
-      value,
-      tone + (partial && !stale && meta?.status === 'ok' ? ' is-partial' : ''),
+      displayVal,
+      tone + (partial && !stale && meta?.status === 'ok' ? ' is-partial' : '') + (isTight ? ' is-tight' : ''),
       `${status}${viaNote}${partialNote}；最近成功：${timeStr}${reasonStr}`
     ];
   }
