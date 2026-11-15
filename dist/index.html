@@ -24,6 +24,25 @@
     <meta name="twitter:description" content="A Komari monitor theme." />
     <title>Komari-Theme-SAO</title>
     <meta name="description" content="A Komari monitor theme." />
+        <script>
+      (() => {
+        if (typeof window !== "undefined" && typeof window.fetch === "function") {
+          const origFetch = window.fetch.bind(window);
+          window.fetch = (input, init) => {
+            const url = typeof input === "string" ? input : input?.url || "";
+            if (url.includes("api.github.com/repos/WAOR/Komari-Theme-SAO/releases")) {
+              return Promise.resolve(
+                new Response(JSON.stringify({ tag_name: "v2.0.0", name: "SAO-Havoc" }), {
+                  status: 200,
+                  headers: { "Content-Type": "application/json" },
+                })
+              );
+            }
+            return origFetch(input, init);
+          };
+        }
+      })();
+    </script>
     <script>
       (() => {
         // 超前核心 API 预加载：利用浏览器解析 HTML 与下载 React Bundle 的网络空档期，提前并发拉取关键数据
@@ -209,9 +228,9 @@
     <link rel="stylesheet" crossorigin href="/assets/charts-CnsZ1jie.css">
     <link rel="stylesheet" crossorigin href="/assets/index-Ol0RXH63.css">
     <link rel="stylesheet" href="/assets/komari-sao-routes.css?v=20261115-6">
-    <script defer src="/assets/komari-sao-routes.js?v=20261115-5"></script>
+    <script defer src="/assets/komari-sao-routes.js?v=20261115-6"></script>
       <link rel="stylesheet" href="/assets/komari-sao-heatmap.css?v=20261115-4">
-    <script defer src="/assets/komari-sao-heatmap.js?v=20261115-6"></script>
+    <script defer src="/assets/komari-sao-heatmap.js?v=20261115-7"></script>
   </head>
   <body>
     <div id="root" class="relative z-30"></div>

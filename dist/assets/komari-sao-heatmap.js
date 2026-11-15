@@ -8,6 +8,7 @@
   let dailyMap = loadHistory();
   let backupData = null;
   let lastFetchTs = 0;
+  let lastDomSyncTs = 0;
   let lastBackupFetchTs = 0;
   let fetching = false;
   let tipEl = null;
@@ -202,9 +203,9 @@
           id: 1,
           method: "public:queryMetrics",
           params: {
-            metrics: ["traffic.up", "traffic.down"],
-            start_time: startDate.toISOString(),
-            end_time: endDate.toISOString(),
+            metric_keys: ["traffic.up", "traffic.down"],
+            start: startDate.toISOString(),
+            end: endDate.toISOString(),
             max_points: 500,
             aggregation_by_metric: {
               "traffic.up": "sum",
@@ -562,8 +563,12 @@
       }
       fetchMetrics();
       fetchBackupStatus();
-    } else if (syncDomTodayOnly()) {
-      renderHeatmapCard();
+    } else {
+      const now = Date.now();
+      if (now - lastDomSyncTs >= 10000) {
+        lastDomSyncTs = now;
+        if (syncDomTodayOnly()) renderHeatmapCard();
+      }
     }
   }
 

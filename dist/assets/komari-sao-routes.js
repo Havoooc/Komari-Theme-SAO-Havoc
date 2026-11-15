@@ -171,7 +171,7 @@
         render();
       });
     }
-  }).observe(document.documentElement, { childList: true, subtree: true });
+  }).observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
 
   refresh();
   setInterval(refresh, 60000);
