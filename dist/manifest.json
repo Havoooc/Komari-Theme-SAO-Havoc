@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Komari Monitor",
-  "short_name": "Komari",
-  "description": "A Komari server monitor.",
+  "name": "VPS Monitor",
+  "short_name": "VPS Monitor",
+  "description": "Private monitoring",
   "lang": "zh-CN",
   "start_url": "/",
   "scope": "/",

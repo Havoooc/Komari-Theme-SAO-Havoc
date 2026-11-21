@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="keywords"
-      content="Komari-Theme-SAO, SAO, server monitor, real-time server status, server performance dashboard, monitoring tool" />
+      content="VPS Monitor, server monitor, real-time server status, server performance dashboard, monitoring tool" />
     <meta name="theme-color" content="#f4f5f7" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
@@ -13,24 +13,24 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Komari-Theme-SAO" />
+    <meta name="apple-mobile-web-app-title" content="VPS Monitor" />
     <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
     <link rel="apple-touch-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="192x192" href="/favicon.ico" />
-    <meta property="og:title" content="Komari-Theme-SAO" />
-    <meta property="og:description" content="A Komari monitor theme." />
+    <meta property="og:title" content="VPS Monitor" />
+    <meta property="og:description" content="Private monitoring" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Komari-Theme-SAO" />
-    <meta name="twitter:description" content="A Komari monitor theme." />
-    <title>Komari-Theme-SAO</title>
-    <meta name="description" content="A Komari monitor theme." />
+    <meta name="twitter:title" content="VPS Monitor" />
+    <meta name="twitter:description" content="Private monitoring" />
+    <title>VPS Monitor</title>
+    <meta name="description" content="Private monitoring" />
         <script>
       (() => {
         if (typeof window !== "undefined" && typeof window.fetch === "function") {
           const origFetch = window.fetch.bind(window);
           window.fetch = (input, init) => {
             const url = typeof input === "string" ? input : input?.url || "";
-            if (url.includes("api.github.com/repos/WAOR/Komari-Theme-SAO/releases")) {
+            if (url.includes("api.github.com/repos/") || url.includes("raw.githubusercontent.com/WAOR/") || url.includes("raw.githubusercontent.com/komari-monitor/komari/refs/heads/main/README.md")) {
               return Promise.resolve(
                 new Response(JSON.stringify({ tag_name: "v2.0.0", name: "SAO-Havoc" }), {
                   status: 200,
@@ -217,7 +217,7 @@
         } catch {}
       })();
     </script>
-    <script type="module" crossorigin src="/assets/index-Z2oZKY3B.js"></script>
+    <script type="module" crossorigin src="/assets/index-Z2oZKY3B.js?v=20261121-clean1"></script>
     <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-Cyuzqnbw.js">
     <link rel="modulepreload" crossorigin href="/assets/charts-lRTmaCY8.js">
     <link rel="modulepreload" crossorigin href="/assets/react-BOHBWzdN.js">
