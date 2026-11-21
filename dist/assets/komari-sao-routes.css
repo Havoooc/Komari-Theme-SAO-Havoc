@@ -913,3 +913,24 @@
 :root[data-appearance="dark"] .sao-mob-in-t {
   color: #e4e4e7;
 }
+
+/* Fix Dark Mode Progress/Traffic Track Disappearing on Hover / iOS Touch */
+:root[data-appearance="dark"] {
+  --progress-bg: #323238 !important;
+}
+
+:root[data-appearance="dark"] .server-card:hover,
+:root[data-appearance="dark"] .compact-node-card:hover,
+:root[data-appearance="dark"] .mini-node-card:hover {
+  --progress-bg: #3f3f46 !important;
+}
+
+@media (hover: none) {
+  :root[data-appearance="dark"] .server-card:hover,
+  :root[data-appearance="dark"] .compact-node-card:hover,
+  :root[data-appearance="dark"] .mini-node-card:hover {
+    background: var(--surface, #1c1c1f) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
+  }
+}
