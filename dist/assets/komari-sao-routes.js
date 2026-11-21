@@ -18,14 +18,18 @@
       return [meta?.last_attempt_at ? '未识别' : '待检测', 'pending', attemptText];
     }
     const time = meta?.probed_at;
-    const stale = !time || Date.now() - Date.parse(time) > STALE_MS;
+    const ageMs = time ? Date.now() - Date.parse(time) : Infinity;
+    const stale = !time || ageMs > STALE_MS;
+    const transientFail = meta?.status === 'failed' && ageMs <= 24 * 3600 * 1000;
     const status = stale
       ? '已过期'
-      : meta?.status === 'failed'
-        ? '最近探测失败'
-        : meta?.status === 'held'
-          ? '变化待确认'
-          : '正常';
+      : transientFail
+        ? '最近复测临时超时（沿用 24h 内上次成功结果）'
+        : meta?.status === 'failed'
+          ? '最近探测失败'
+          : meta?.status === 'held'
+            ? '变化待确认'
+            : '正常';
     const partial = meta?.destination_reached === false || meta?.path_incomplete === true;
     const quality =
       meta?.quality === 'excellent' || meta?.quality === 'good' || meta?.quality === 'standard'
@@ -35,7 +39,7 @@
           : /(10099|CMI)/i.test(value)
             ? 'good'
             : 'standard';
-    const tone = stale || meta?.status !== 'ok' ? 'pending' : quality;
+    const tone = stale || (meta?.status !== 'ok' && !transientFail) ? 'pending' : quality;
     const viaNote = meta?.via ? `（${meta.via}）` : '';
     const partialNote = partial ? ' · 末跳未完整响应' : '';
     const timeStr = time ? new Date(time).toLocaleString('zh-CN') : '未知';
