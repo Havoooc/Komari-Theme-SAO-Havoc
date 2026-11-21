@@ -178,3 +178,112 @@
 .sao-rt-chip.is-partial {
   border-style: dashed;
 }
+
+
+/* Footer Option 1: Single Compact Row + Currency SVG Flag */
+.server-card-footer {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+}
+
+.server-card-footer > .server-card-meta-grid {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+}
+
+.server-card-footer .server-card-meta {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  width: auto !important;
+  flex: none !important;
+  white-space: nowrap !important;
+}
+
+.server-card-footer > .dstatus-tags-row:not(.dstatus-tags-measure) {
+  margin-top: 0 !important;
+  flex: none !important;
+  width: auto !important;
+}
+
+.dstatus-price-chip.has-sao-flag {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  white-space: nowrap !important;
+}
+
+.dstatus-price-chip.has-sao-flag > svg.lucide-circle-dollar-sign {
+  display: none !important;
+}
+
+.sao-cur-flag {
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+  object-fit: cover;
+  display: inline-block;
+  flex: none;
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.16);
+}
+
+:root[data-appearance="dark"] .sao-cur-flag {
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.22);
+}
+
+@media (max-width: 440px) {
+  .server-card-footer {
+    gap: 6px !important;
+  }
+  .server-card-footer > .server-card-meta-grid {
+    gap: 10px !important;
+  }
+  .server-card-footer .server-card-meta-label {
+    font-size: 10.5px !important;
+    gap: 3px !important;
+  }
+  .server-card-footer .server-card-meta-label svg {
+    width: 11px !important;
+    height: 11px !important;
+  }
+  .server-card-footer .server-card-meta-value {
+    font-size: 11.5px !important;
+  }
+  .dstatus-price-chip.has-sao-flag {
+    font-size: 10.5px !important;
+    padding: 2.5px 6.5px !important;
+    gap: 4px !important;
+  }
+  .sao-cur-flag {
+    width: 12px;
+    height: 8.5px;
+  }
+}
+
+@media (max-width: 360px) {
+  .server-card-footer {
+    gap: 4px !important;
+  }
+  .server-card-footer > .server-card-meta-grid {
+    gap: 7px !important;
+  }
+  .server-card-footer .server-card-meta-label {
+    font-size: 9.8px !important;
+  }
+  .server-card-footer .server-card-meta-value {
+    font-size: 10.5px !important;
+  }
+  .dstatus-price-chip.has-sao-flag {
+    font-size: 9.8px !important;
+    padding: 2px 5px !important;
+  }
+}

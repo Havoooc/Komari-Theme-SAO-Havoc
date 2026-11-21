@@ -131,7 +131,36 @@
     }
   }
 
+
+  function detectCurrencyFlag(text) {
+    const t = String(text || "").trim();
+    if (/^(C\$|CA\$|CAD)/i.test(t) || /\bCAD\b/i.test(t)) return "ca";
+    if (/^(HK\$|HKD)/i.test(t) || /\bHKD\b/i.test(t)) return "hk";
+    if (/^(€|EUR)/i.test(t) || /\bEUR\b/i.test(t)) return "eu";
+    if (/^(£|GBP)/i.test(t) || /\bGBP\b/i.test(t)) return "gb";
+    if (/\bJPY\b/i.test(t)) return "jp";
+    if (/^(¥|￥|CNY|RMB)/i.test(t) || /\b(CNY|RMB)\b/i.test(t)) return "cn";
+    if (/^(\$|US\$|USD)/i.test(t) || /\bUSD\b/i.test(t)) return "us";
+    return "us";
+  }
+
+  function decoratePriceChips() {
+    const chips = document.querySelectorAll(".dstatus-tags-row:not(.dstatus-tags-measure) .dstatus-price-chip:not(.has-sao-flag)");
+    for (const chip of chips) {
+      const code = detectCurrencyFlag(chip.textContent);
+      const img = document.createElement("img");
+      img.className = "sao-cur-flag";
+      img.src = `/assets/flags/${code}.svg`;
+      img.alt = code.toUpperCase();
+      img.loading = "lazy";
+      img.draggable = false;
+      chip.prepend(img);
+      chip.classList.add("has-sao-flag");
+    }
+  }
+
   function render() {
+    decoratePriceChips();
     const cards = document.querySelectorAll('.server-card, .compact-node-card, .mini-node-card');
     for (const card of cards) {
       const id = extractNodeId(card);
