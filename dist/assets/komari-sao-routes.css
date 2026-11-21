@@ -280,233 +280,6 @@
   }
 }
 
-/* SAO-Havoc Network Section Redesign (Option 1: Dual Semantic Mini-Cards) */
-.server-traffic-section {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: 10px !important;
-}
-
-.server-traffic-section .traffic-stat {
-  border-radius: 10px !important;
-  padding: 9px 11px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 6px !important;
-  min-width: 0 !important;
-}
-
-.server-traffic-section .traffic-stat:first-child {
-  background: rgba(37, 99, 235, 0.045) !important;
-  border: 1px solid rgba(37, 99, 235, 0.14) !important;
-}
-
-.server-traffic-section .traffic-stat:last-child {
-  background: rgba(5, 150, 105, 0.045) !important;
-  border: 1px solid rgba(5, 150, 105, 0.14) !important;
-}
-
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat:first-child {
-  background: rgba(59, 130, 246, 0.085) !important;
-  border-color: rgba(96, 165, 250, 0.22) !important;
-}
-
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat:last-child {
-  background: rgba(16, 185, 129, 0.085) !important;
-  border-color: rgba(52, 211, 153, 0.22) !important;
-}
-
-.server-traffic-section .traffic-stat-trend {
-  display: none !important;
-}
-
-.server-traffic-section .traffic-stat-head {
-  display: flex !important;
-  align-items: baseline !important;
-  justify-content: space-between !important;
-  gap: 6px !important;
-}
-
-.server-traffic-section .traffic-stat-label {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  font-size: 11.5px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0 !important;
-  white-space: nowrap !important;
-}
-
-.server-traffic-section .traffic-stat-label > span:first-child {
-  display: inline-flex !important;
-  align-items: center !important;
-  align-self: center !important;
-}
-
-.server-traffic-section .traffic-stat-label svg {
-  width: 13px !important;
-  height: 13px !important;
-  flex: none !important;
-}
-
-.server-traffic-section .traffic-stat:first-child .traffic-stat-label,
-.server-traffic-section .traffic-stat:first-child .traffic-stat-label span {
-  color: #2563eb !important;
-}
-
-.server-traffic-section .traffic-stat:last-child .traffic-stat-label,
-.server-traffic-section .traffic-stat:last-child .traffic-stat-label span {
-  color: #059669 !important;
-}
-
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat:first-child .traffic-stat-label,
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat:first-child .traffic-stat-label span {
-  color: #60a5fa !important;
-}
-
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat:last-child .traffic-stat-label,
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat:last-child .traffic-stat-label span {
-  color: #34d399 !important;
-}
-
-.server-traffic-section .traffic-stat-value {
-  font-size: 16.5px !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.02em !important;
-  line-height: 1.15 !important;
-  color: #0f172a !important;
-  white-space: nowrap !important;
-}
-
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat-value {
-  color: #f8fafc !important;
-}
-
-.server-traffic-section .traffic-stat-unit {
-  font-size: 11px !important;
-  font-weight: 500 !important;
-  margin-left: 2px !important;
-  color: #64748b !important;
-}
-
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat-unit {
-  color: #a1a1aa !important;
-}
-
-.server-traffic-section .traffic-stat-foot {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 6px !important;
-  padding-top: 6px !important;
-  margin-top: 0 !important;
-  font-size: 11.5px !important;
-}
-
-.server-traffic-section .traffic-stat:first-child .traffic-stat-foot {
-  border-top: 1px solid rgba(37, 99, 235, 0.1) !important;
-}
-
-.server-traffic-section .traffic-stat:last-child .traffic-stat-foot {
-  border-top: 1px solid rgba(5, 150, 105, 0.1) !important;
-}
-
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat:first-child .traffic-stat-foot {
-  border-top-color: rgba(96, 165, 250, 0.14) !important;
-}
-
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat:last-child .traffic-stat-foot {
-  border-top-color: rgba(52, 211, 153, 0.14) !important;
-}
-
-.server-traffic-section .traffic-stat-total-label {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  font-size: 11.5px !important;
-  font-weight: 500 !important;
-  color: #64748b !important;
-  white-space: nowrap !important;
-}
-
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat-total-label {
-  color: #a1a1aa !important;
-}
-
-.server-traffic-section .traffic-stat-total-label > span:first-child {
-  width: 14px !important;
-  height: 14px !important;
-}
-
-.server-traffic-section .traffic-stat-total-label > span:first-child > svg:first-child {
-  width: 12px !important;
-  height: 12px !important;
-}
-
-.server-traffic-section .traffic-stat-total-label > span:first-child > svg:last-child {
-  width: 7.5px !important;
-  height: 7.5px !important;
-}
-
-.server-traffic-section .traffic-stat:first-child .traffic-stat-total-label > span:first-child {
-  color: #3b82f6 !important;
-}
-
-.server-traffic-section .traffic-stat:last-child .traffic-stat-total-label > span:first-child {
-  color: #10b981 !important;
-}
-
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat:first-child .traffic-stat-total-label > span:first-child {
-  color: #60a5fa !important;
-}
-
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat:last-child .traffic-stat-total-label > span:first-child {
-  color: #34d399 !important;
-}
-
-.server-traffic-section .traffic-stat-foot > .tabular {
-  font-weight: 600 !important;
-  color: #334155 !important;
-  white-space: nowrap !important;
-}
-
-:root[data-appearance="dark"] .server-traffic-section .traffic-stat-foot > .tabular {
-  color: #e4e4e7 !important;
-}
-
-@media (max-width: 440px) {
-  .server-traffic-section {
-    gap: 8px !important;
-  }
-  .server-traffic-section .traffic-stat {
-    padding: 7px 9px !important;
-    gap: 5px !important;
-    border-radius: 9px !important;
-  }
-  .server-traffic-section .traffic-stat-label {
-    font-size: 10.5px !important;
-    gap: 3px !important;
-  }
-  .server-traffic-section .traffic-stat-label svg {
-    width: 11.5px !important;
-    height: 11.5px !important;
-  }
-  .server-traffic-section .traffic-stat-value {
-    font-size: 14.5px !important;
-  }
-  .server-traffic-section .traffic-stat-unit {
-    font-size: 10px !important;
-  }
-  .server-traffic-section .traffic-stat-foot {
-    padding-top: 5px !important;
-    font-size: 10.5px !important;
-  }
-  .server-traffic-section .traffic-stat-total-label {
-    font-size: 10.5px !important;
-    gap: 3px !important;
-  }
-}
-
 /* SAO-Havoc Hardware Health Redesign (Option 1: 2x2 Frosted Micro-Tile Cockpit — Desktop & Mobile Unified) */
 .server-metric-grid:has(> .metric-item.has-sao-tile),
 .compact-node-vitals:has(> .compact-node-gauge.has-sao-tile) {
@@ -733,7 +506,136 @@
   }
 }
 
-/* SAO-Havoc Mobile Compact Card Redesign (Option 3: Header Billing Pills + Clean Dual Network) */
+/* SAO-Havoc Network Section Redesign v2 (Option 1: Full-Width Unified Telemetry Console — Desktop & Mobile) */
+.server-traffic-section.has-sao-net-console,
+.compact-node-info-strip.has-sao-mob-net {
+  display: block !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.server-traffic-section.has-sao-net-console > :not(.sao-net-console),
+.compact-node-info-strip.has-sao-mob-net > :not(.sao-net-console) {
+  display: none !important;
+}
+
+.sao-net-console {
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.045) 0%, rgba(248, 250, 252, 0.9) 50%, rgba(5, 150, 105, 0.045) 100%);
+  border: 1px solid #e2e8f0;
+}
+
+:root[data-appearance="dark"] .sao-net-console {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.085) 0%, rgba(24, 24, 27, 0.6) 50%, rgba(16, 185, 129, 0.085) 100%);
+  border-color: rgba(255, 255, 255, 0.085);
+}
+
+.sao-net-console-div {
+  width: 1px;
+  height: 36px;
+  background: #e2e8f0;
+}
+
+:root[data-appearance="dark"] .sao-net-console-div {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sao-net-wing {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sao-net-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.sao-net-wing.is-up .sao-net-badge {
+  background: rgba(37, 99, 235, 0.11);
+  color: #2563eb;
+}
+:root[data-appearance="dark"] .sao-net-wing.is-up .sao-net-badge {
+  background: rgba(96, 165, 250, 0.16);
+  color: #60a5fa;
+}
+
+.sao-net-wing.is-down .sao-net-badge {
+  background: rgba(5, 150, 105, 0.11);
+  color: #059669;
+}
+:root[data-appearance="dark"] .sao-net-wing.is-down .sao-net-badge {
+  background: rgba(52, 211, 153, 0.16);
+  color: #34d399;
+}
+
+.sao-net-data {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2.5px;
+  min-width: 0;
+}
+
+.sao-net-rate {
+  font-size: 16.5px;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.sao-net-wing.is-up .sao-net-rate { color: #1d4ed8; }
+:root[data-appearance="dark"] .sao-net-wing.is-up .sao-net-rate { color: #93c5fd; }
+
+.sao-net-wing.is-down .sao-net-rate { color: #047857; }
+:root[data-appearance="dark"] .sao-net-wing.is-down .sao-net-rate { color: #6ee7b7; }
+
+.sao-net-unit {
+  font-size: 10.5px;
+  font-weight: 600;
+  margin-left: 2px;
+  opacity: 0.65;
+}
+
+.sao-net-sub {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+:root[data-appearance="dark"] .sao-net-sub {
+  color: #a1a1aa;
+}
+
+.sao-net-sub strong {
+  font-weight: 650;
+  color: #334155;
+}
+
+:root[data-appearance="dark"] .sao-net-sub strong {
+  color: #e4e4e7;
+}
+
+/* SAO-Havoc Mobile Compact Card Header Billing Pills */
 .compact-node-chip-row.has-sao-head-bill {
   display: flex !important;
   align-items: center !important;
@@ -798,151 +700,52 @@
   height: 8.5px;
 }
 
-.compact-node-info-strip.has-sao-mob-net {
-  display: block !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-
-.compact-node-info-strip.has-sao-mob-net > :not(.sao-mob-net-dual) {
-  display: none !important;
-}
-
-.sao-mob-net-dual {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  gap: 8px !important;
-  width: 100%;
-}
-
-.sao-mob-net-box {
-  border-radius: 9px;
-  padding: 6.5px 9.5px;
-  display: flex;
-  flex-direction: column;
-  gap: 3.5px;
-  min-width: 0;
-}
-
-.sao-mob-net-box.is-up {
-  background: rgba(37, 99, 235, 0.04);
-  border: 1px solid rgba(37, 99, 235, 0.12);
-}
-
-:root[data-appearance="dark"] .sao-mob-net-box.is-up {
-  background: rgba(59, 130, 246, 0.08);
-  border-color: rgba(96, 165, 250, 0.18);
-}
-
-.sao-mob-net-box.is-down {
-  background: rgba(5, 150, 105, 0.04);
-  border: 1px solid rgba(5, 150, 105, 0.12);
-}
-
-:root[data-appearance="dark"] .sao-mob-net-box.is-down {
-  background: rgba(16, 185, 129, 0.08);
-  border-color: rgba(52, 211, 153, 0.18);
-}
-
-.sao-mob-net-r1 {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 4px;
-}
-
-.sao-mob-net-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 10.5px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.sao-mob-net-tag svg {
-  align-self: center;
-  flex: none;
-}
-
-.sao-mob-net-box.is-up .sao-mob-net-tag { color: #2563eb; }
-:root[data-appearance="dark"] .sao-mob-net-box.is-up .sao-mob-net-tag { color: #60a5fa; }
-
-.sao-mob-net-box.is-down .sao-mob-net-tag { color: #059669; }
-:root[data-appearance="dark"] .sao-mob-net-box.is-down .sao-mob-net-tag { color: #34d399; }
-
-.sao-mob-net-spd {
-  font-size: 14.5px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: #0f172a;
-  white-space: nowrap;
-}
-
-:root[data-appearance="dark"] .sao-mob-net-spd {
-  color: #f8fafc;
-}
-
-.sao-mob-up-u,
-.sao-mob-dn-u {
-  font-size: 10px;
-  font-weight: 500;
-  margin-left: 1.5px;
-  opacity: 0.72;
-  color: #64748b;
-}
-
-:root[data-appearance="dark"] .sao-mob-up-u,
-:root[data-appearance="dark"] .sao-mob-dn-u {
-  color: #a1a1aa;
-}
-
-.sao-mob-net-r2 {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 10px;
-  color: #64748b;
-}
-
-:root[data-appearance="dark"] .sao-mob-net-r2 {
-  color: #a1a1aa;
-}
-
-.sao-mob-out-t,
-.sao-mob-in-t {
-  font-weight: 600;
-  color: #334155;
-}
-
-:root[data-appearance="dark"] .sao-mob-out-t,
-:root[data-appearance="dark"] .sao-mob-in-t {
-  color: #e4e4e7;
+@media (max-width: 440px) {
+  .sao-net-console {
+    padding: 8.5px 11px;
+    gap: 10px;
+    border-radius: 11px;
+  }
+  .sao-net-console-div {
+    height: 32px;
+  }
+  .sao-net-badge {
+    width: 26px;
+    height: 26px;
+  }
+  .sao-net-badge svg {
+    width: 13px;
+    height: 13px;
+  }
+  .sao-net-rate {
+    font-size: 14.5px;
+  }
+  .sao-net-unit {
+    font-size: 9.5px;
+  }
+  .sao-net-sub {
+    font-size: 9.8px;
+  }
 }
 
 @media (max-width: 380px) {
-  .sao-mob-net-dual {
-    gap: 6px !important;
+  .sao-net-console {
+    padding: 7.5px 9px;
+    gap: 8px;
   }
-  .sao-mob-net-box {
-    padding: 5.5px 7.5px;
+  .sao-net-badge {
+    width: 23px;
+    height: 23px;
   }
-  .sao-mob-net-tag {
-    font-size: 10px;
+  .sao-net-badge svg {
+    width: 12px;
+    height: 12px;
   }
-  .sao-mob-net-spd {
-    font-size: 13px;
+  .sao-net-rate {
+    font-size: 13.5px;
   }
-  .sao-mob-up-u,
-  .sao-mob-dn-u {
-    font-size: 9px;
-  }
-  .sao-mob-net-r2 {
-    font-size: 9.5px;
+  .sao-net-sub {
+    font-size: 9.2px;
   }
   .sao-mob-head-bill {
     gap: 4px;
@@ -990,8 +793,8 @@
 
 .server-card.is-offline .sao-tile-cell,
 .compact-node-card.is-offline .sao-tile-cell,
-.server-card.is-offline .server-traffic-section .traffic-stat,
-.compact-node-card.is-offline .sao-mob-net-dual,
+.server-card.is-offline .sao-net-console,
+.compact-node-card.is-offline .sao-net-console,
 .compact-node-card.is-offline .sao-mob-head-bill,
 .server-card.is-offline .dstatus-price-chip.has-sao-flag {
   filter: saturate(0.28);

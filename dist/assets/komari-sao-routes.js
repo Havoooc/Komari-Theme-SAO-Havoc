@@ -340,26 +340,72 @@
     return { val: val || "0", unit };
   }
 
-  function createCompactNetDual() {
-    const dual = document.createElement("div");
-    dual.className = "sao-mob-net-dual";
-    dual.innerHTML = [
-      '<div class="sao-mob-net-box is-up">' +
-        '<div class="sao-mob-net-r1">' +
-          '<span class="sao-mob-net-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>上行</span>' +
-          '<span class="sao-mob-net-spd tabular"><span class="sao-mob-up-v"></span><span class="sao-mob-up-u"></span></span>' +
+  function readDesktopTrafficStat(stat) {
+    if (!stat) return { val: "0", unit: "", total: "--" };
+    const valNode = stat.querySelector(".traffic-stat-value");
+    const unitNode = valNode?.querySelector(".traffic-stat-unit");
+    const unit = (unitNode?.textContent || "").trim();
+    const raw = (valNode?.textContent || "").trim();
+    const val = unit && raw.endsWith(unit) ? raw.slice(0, raw.length - unit.length).trim() : raw;
+    const total = (stat.querySelector(".traffic-stat-foot > .tabular")?.textContent || "--").trim();
+    return { val: val || "0", unit, total };
+  }
+
+  function createNetConsole() {
+    const box = document.createElement("div");
+    box.className = "sao-net-console";
+    box.innerHTML = [
+      '<div class="sao-net-wing is-up">' +
+        '<span class="sao-net-badge" aria-hidden="true">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>' +
+        '</span>' +
+        '<div class="sao-net-data">' +
+          '<span class="sao-net-rate tabular"><span class="sao-net-up-v"></span><span class="sao-net-unit sao-net-up-u"></span></span>' +
+          '<span class="sao-net-sub">上行 · 出站 <strong class="sao-net-out-t tabular"></strong></span>' +
         '</div>' +
-        '<div class="sao-mob-net-r2"><span>累计出站</span><span class="sao-mob-out-t tabular"></span></div>' +
       '</div>',
-      '<div class="sao-mob-net-box is-down">' +
-        '<div class="sao-mob-net-r1">' +
-          '<span class="sao-mob-net-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>下行</span>' +
-          '<span class="sao-mob-net-spd tabular"><span class="sao-mob-dn-v"></span><span class="sao-mob-dn-u"></span></span>' +
+      '<div class="sao-net-console-div" aria-hidden="true"></div>',
+      '<div class="sao-net-wing is-down">' +
+        '<span class="sao-net-badge" aria-hidden="true">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>' +
+        '</span>' +
+        '<div class="sao-net-data">' +
+          '<span class="sao-net-rate tabular"><span class="sao-net-dn-v"></span><span class="sao-net-unit sao-net-dn-u"></span></span>' +
+          '<span class="sao-net-sub">下行 · 入站 <strong class="sao-net-in-t tabular"></strong></span>' +
         '</div>' +
-        '<div class="sao-mob-net-r2"><span>累计入站</span><span class="sao-mob-in-t tabular"></span></div>' +
       '</div>',
     ].join("");
-    return dual;
+    return box;
+  }
+
+  function syncNetConsole(container, up, dn, outT, inT) {
+    let con = container.querySelector(":scope > .sao-net-console");
+    if (!con) {
+      con = createNetConsole();
+      container.appendChild(con);
+    }
+    const sig = `${up.val}|${up.unit}|${dn.val}|${dn.unit}|${outT}|${inT}`;
+    if (con.dataset.sig !== sig) {
+      con.dataset.sig = sig;
+      con.querySelector(".sao-net-up-v").textContent = up.val;
+      con.querySelector(".sao-net-up-u").textContent = up.unit;
+      con.querySelector(".sao-net-dn-v").textContent = dn.val;
+      con.querySelector(".sao-net-dn-u").textContent = dn.unit;
+      con.querySelector(".sao-net-out-t").textContent = outT;
+      con.querySelector(".sao-net-in-t").textContent = inT;
+    }
+  }
+
+  function decorateDesktopTraffic() {
+    const sections = document.querySelectorAll(".server-traffic-section");
+    for (const sec of sections) {
+      const stats = sec.querySelectorAll(":scope > .traffic-stat");
+      if (stats.length < 2) continue;
+      const up = readDesktopTrafficStat(stats[0]);
+      const dn = readDesktopTrafficStat(stats[1]);
+      if (!sec.classList.contains("has-sao-net-console")) sec.classList.add("has-sao-net-console");
+      syncNetConsole(sec, up, dn, up.total, dn.total);
+    }
   }
 
   function decorateCompactCards() {
@@ -380,21 +426,7 @@
         const inT = totRows[1] ? (totRows[1].querySelector(".compact-node-info-row-value")?.textContent || "--").trim() : "--";
 
         if (!strip.classList.contains("has-sao-mob-net")) strip.classList.add("has-sao-mob-net");
-        let dual = strip.querySelector(":scope > .sao-mob-net-dual");
-        if (!dual) {
-          dual = createCompactNetDual();
-          strip.appendChild(dual);
-        }
-        const netSig = `${up.val}|${up.unit}|${dn.val}|${dn.unit}|${outT}|${inT}`;
-        if (dual.dataset.sig !== netSig) {
-          dual.dataset.sig = netSig;
-          dual.querySelector(".sao-mob-up-v").textContent = up.val;
-          dual.querySelector(".sao-mob-up-u").textContent = up.unit;
-          dual.querySelector(".sao-mob-dn-v").textContent = dn.val;
-          dual.querySelector(".sao-mob-dn-u").textContent = dn.unit;
-          dual.querySelector(".sao-mob-out-t").textContent = outT;
-          dual.querySelector(".sao-mob-in-t").textContent = inT;
-        }
+        syncNetConsole(strip, up, dn, outT, inT);
       }
 
       const chipRow = card.querySelector(".compact-node-chip-row");
@@ -461,6 +493,7 @@
 
   function render() {
     decorateHealthTiles();
+    decorateDesktopTraffic();
     decorateCompactCards();
     decoratePriceChips();
     const cards = document.querySelectorAll('.server-card, .compact-node-card, .mini-node-card');
@@ -508,7 +541,7 @@
   new MutationObserver((mutations) => {
     if (mutations.every((m) => {
       const el = m.target.nodeType === 1 ? m.target : m.target.parentElement;
-      return Boolean(el && (el.closest(".sao-tile-cell") || el.closest(".sao-mob-net-dual") || el.closest(".sao-mob-head-bill")));
+      return Boolean(el && (el.closest(".sao-tile-cell") || el.closest(".sao-net-console") || el.closest(".sao-mob-head-bill")));
     })) return;
     if (!queued) {
       queued = true;
