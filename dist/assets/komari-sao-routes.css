@@ -726,3 +726,190 @@
     font-size: 9.8px;
   }
 }
+
+/* SAO-Havoc Mobile Compact Card Redesign (Option 3: Header Billing Pills + Clean Dual Network) */
+.compact-node-chip-row.has-sao-head-bill {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 6px !important;
+  flex-wrap: wrap !important;
+}
+
+.sao-mob-head-bill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex: none;
+}
+
+.sao-mob-exp-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+:root[data-appearance="dark"] .sao-mob-exp-pill {
+  background: rgba(255, 255, 255, 0.055);
+  color: #d4d4d8;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.sao-mob-price-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(16, 185, 129, 0.075);
+  border: 1px solid rgba(5, 150, 105, 0.22);
+  color: #059669;
+}
+
+:root[data-appearance="dark"] .sao-mob-price-pill {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(52, 211, 153, 0.24);
+  color: #34d399;
+}
+
+.sao-mob-price-pill .sao-cur-flag {
+  width: 12px;
+  height: 8.5px;
+}
+
+.compact-node-info-strip.has-sao-mob-net {
+  display: block !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.compact-node-info-strip.has-sao-mob-net > :not(.sao-mob-net-dual) {
+  display: none !important;
+}
+
+.sao-mob-net-dual {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  width: 100%;
+}
+
+.sao-mob-net-box {
+  border-radius: 9px;
+  padding: 6.5px 9.5px;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5px;
+  min-width: 0;
+}
+
+.sao-mob-net-box.is-up {
+  background: rgba(37, 99, 235, 0.04);
+  border: 1px solid rgba(37, 99, 235, 0.12);
+}
+
+:root[data-appearance="dark"] .sao-mob-net-box.is-up {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(96, 165, 250, 0.18);
+}
+
+.sao-mob-net-box.is-down {
+  background: rgba(5, 150, 105, 0.04);
+  border: 1px solid rgba(5, 150, 105, 0.12);
+}
+
+:root[data-appearance="dark"] .sao-mob-net-box.is-down {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(52, 211, 153, 0.18);
+}
+
+.sao-mob-net-r1 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.sao-mob-net-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sao-mob-net-tag svg {
+  align-self: center;
+  flex: none;
+}
+
+.sao-mob-net-box.is-up .sao-mob-net-tag { color: #2563eb; }
+:root[data-appearance="dark"] .sao-mob-net-box.is-up .sao-mob-net-tag { color: #60a5fa; }
+
+.sao-mob-net-box.is-down .sao-mob-net-tag { color: #059669; }
+:root[data-appearance="dark"] .sao-mob-net-box.is-down .sao-mob-net-tag { color: #34d399; }
+
+.sao-mob-net-spd {
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+:root[data-appearance="dark"] .sao-mob-net-spd {
+  color: #f8fafc;
+}
+
+.sao-mob-up-u,
+.sao-mob-dn-u {
+  font-size: 10px;
+  font-weight: 500;
+  margin-left: 1.5px;
+  opacity: 0.72;
+  color: #64748b;
+}
+
+:root[data-appearance="dark"] .sao-mob-up-u,
+:root[data-appearance="dark"] .sao-mob-dn-u {
+  color: #a1a1aa;
+}
+
+.sao-mob-net-r2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  color: #64748b;
+}
+
+:root[data-appearance="dark"] .sao-mob-net-r2 {
+  color: #a1a1aa;
+}
+
+.sao-mob-out-t,
+.sao-mob-in-t {
+  font-weight: 600;
+  color: #334155;
+}
+
+:root[data-appearance="dark"] .sao-mob-out-t,
+:root[data-appearance="dark"] .sao-mob-in-t {
+  color: #e4e4e7;
+}

@@ -314,6 +314,121 @@
     }
   }
 
+  function readRowValUnit(row) {
+    if (!row) return { val: "0", unit: "" };
+    const strong = row.querySelector(".compact-node-info-row-value");
+    if (!strong) return { val: "0", unit: "" };
+    const small = strong.querySelector("small");
+    const unit = (small?.textContent || "").trim();
+    const raw = (strong.textContent || "").trim();
+    const val = unit && raw.endsWith(unit) ? raw.slice(0, raw.length - unit.length).trim() : raw;
+    return { val: val || "0", unit };
+  }
+
+  function createCompactNetDual() {
+    const dual = document.createElement("div");
+    dual.className = "sao-mob-net-dual";
+    dual.innerHTML = [
+      '<div class="sao-mob-net-box is-up">' +
+        '<div class="sao-mob-net-r1">' +
+          '<span class="sao-mob-net-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>上行</span>' +
+          '<span class="sao-mob-net-spd tabular"><span class="sao-mob-up-v"></span><span class="sao-mob-up-u"></span></span>' +
+        '</div>' +
+        '<div class="sao-mob-net-r2"><span>累计出站</span><span class="sao-mob-out-t tabular"></span></div>' +
+      '</div>',
+      '<div class="sao-mob-net-box is-down">' +
+        '<div class="sao-mob-net-r1">' +
+          '<span class="sao-mob-net-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>下行</span>' +
+          '<span class="sao-mob-net-spd tabular"><span class="sao-mob-dn-v"></span><span class="sao-mob-dn-u"></span></span>' +
+        '</div>' +
+        '<div class="sao-mob-net-r2"><span>累计入站</span><span class="sao-mob-in-t tabular"></span></div>' +
+      '</div>',
+    ].join("");
+    return dual;
+  }
+
+  function decorateCompactCards() {
+    const cards = document.querySelectorAll(".compact-node-card");
+    for (const card of cards) {
+      const strip = card.querySelector(".compact-node-info-strip");
+      if (!strip) continue;
+
+      const rateTile = strip.querySelector('[aria-label="实时速率"]');
+      if (rateTile) {
+        const rateRows = rateTile.querySelectorAll(".compact-node-info-row");
+        const up = readRowValUnit(rateRows[0]);
+        const dn = readRowValUnit(rateRows[1]);
+
+        const totTile = strip.querySelector('[aria-label="累计流量"]');
+        const totRows = totTile ? totTile.querySelectorAll(".compact-node-info-row") : [];
+        const outT = totRows[0] ? (totRows[0].querySelector(".compact-node-info-row-value")?.textContent || "--").trim() : "--";
+        const inT = totRows[1] ? (totRows[1].querySelector(".compact-node-info-row-value")?.textContent || "--").trim() : "--";
+
+        if (!strip.classList.contains("has-sao-mob-net")) strip.classList.add("has-sao-mob-net");
+        let dual = strip.querySelector(":scope > .sao-mob-net-dual");
+        if (!dual) {
+          dual = createCompactNetDual();
+          strip.appendChild(dual);
+        }
+        const netSig = `${up.val}|${up.unit}|${dn.val}|${dn.unit}|${outT}|${inT}`;
+        if (dual.dataset.sig !== netSig) {
+          dual.dataset.sig = netSig;
+          dual.querySelector(".sao-mob-up-v").textContent = up.val;
+          dual.querySelector(".sao-mob-up-u").textContent = up.unit;
+          dual.querySelector(".sao-mob-dn-v").textContent = dn.val;
+          dual.querySelector(".sao-mob-dn-u").textContent = dn.unit;
+          dual.querySelector(".sao-mob-out-t").textContent = outT;
+          dual.querySelector(".sao-mob-in-t").textContent = inT;
+        }
+      }
+
+      const chipRow = card.querySelector(".compact-node-chip-row");
+      const billTile = strip.querySelector('[aria-label="费用到期"]');
+      if (chipRow && billTile) {
+        const bRows = billTile.querySelectorAll(".compact-node-info-row");
+        const expVal = (bRows[0]?.querySelector(".compact-node-info-row-value")?.textContent || "").trim();
+        const priceVal = (bRows[1]?.querySelector(".compact-node-info-row-value")?.textContent || "").trim();
+        const flagCode = detectCurrencyFlag(priceVal);
+
+        if (!chipRow.classList.contains("has-sao-head-bill")) chipRow.classList.add("has-sao-head-bill");
+        let billWrap = chipRow.querySelector(":scope > .sao-mob-head-bill");
+        if (!billWrap) {
+          billWrap = document.createElement("div");
+          billWrap.className = "sao-mob-head-bill";
+          chipRow.appendChild(billWrap);
+        }
+        const billSig = `${expVal}|${priceVal}|${flagCode}`;
+        if (billWrap.dataset.sig !== billSig) {
+          billWrap.dataset.sig = billSig;
+          billWrap.textContent = "";
+          if (expVal && expVal !== "--" && expVal !== "-") {
+            const expEl = document.createElement("span");
+            expEl.className = "sao-mob-exp-pill tabular";
+            expEl.textContent = expVal;
+            billWrap.appendChild(expEl);
+          }
+          if (priceVal && priceVal !== "--" && priceVal !== "-") {
+            const priceEl = document.createElement("span");
+            priceEl.className = "sao-mob-price-pill tabular";
+            if (priceVal !== "免费") {
+              const img = document.createElement("img");
+              img.className = "sao-cur-flag";
+              img.src = `/assets/flags/${flagCode}.svg`;
+              img.alt = flagCode.toUpperCase();
+              img.loading = "lazy";
+              img.draggable = false;
+              priceEl.appendChild(img);
+            }
+            const txt = document.createElement("span");
+            txt.textContent = priceVal;
+            priceEl.appendChild(txt);
+            billWrap.appendChild(priceEl);
+          }
+        }
+      }
+    }
+  }
+
   function decoratePriceChips() {
     const chips = document.querySelectorAll(".dstatus-tags-row:not(.dstatus-tags-measure) .dstatus-price-chip:not(.has-sao-flag)");
     for (const chip of chips) {
@@ -331,6 +446,7 @@
 
   function render() {
     decorateHealthTiles();
+    decorateCompactCards();
     decoratePriceChips();
     const cards = document.querySelectorAll('.server-card, .compact-node-card, .mini-node-card');
     for (const card of cards) {
@@ -377,7 +493,7 @@
   new MutationObserver((mutations) => {
     if (mutations.every((m) => {
       const el = m.target.nodeType === 1 ? m.target : m.target.parentElement;
-      return Boolean(el && el.closest(".sao-tile-cell"));
+      return Boolean(el && (el.closest(".sao-tile-cell") || el.closest(".sao-mob-net-dual") || el.closest(".sao-mob-head-bill")));
     })) return;
     if (!queued) {
       queued = true;
