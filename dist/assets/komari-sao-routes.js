@@ -144,6 +144,165 @@
     return "us";
   }
 
+  const RING_CIRCUMFERENCE = 119.38;
+  const SVG_NS = "http://www.w3.org/2000/svg";
+
+  function detectHealthMetric(label, idx) {
+    const t = String(label || "").trim().toLowerCase();
+    if (t.includes("cpu")) return "cpu";
+    if (t.includes("内存") || t.includes("mem") || t.includes("ram")) return "ram";
+    if (t.includes("磁盘") || t.includes("disk") || t.includes("storage")) return "disk";
+    if (t.includes("负载") || t.includes("load")) return "load";
+    return ["cpu", "ram", "disk", "load"][idx] || "cpu";
+  }
+
+  function shortUnit(unit) {
+    const u = String(unit || "").toUpperCase();
+    if (u === "TB") return "T";
+    if (u === "GB") return "G";
+    if (u === "MB") return "M";
+    if (u === "KB") return "K";
+    return u;
+  }
+
+  function formatRingSpec(metricKey, detail) {
+    const d = String(detail || "").trim();
+    if (!d) return metricKey === "load" ? "1m 均值" : "\u00A0";
+    const m = d.match(/^([\d.]+)\s*(TB|GB|MB|KB|B)\s*\/\s*([\d.]+)\s*(TB|GB|MB|KB|B)$/i);
+    if (m) {
+      const [, v1, u1, v2, u2] = m;
+      const su1 = shortUnit(u1);
+      const su2 = shortUnit(u2);
+      return su1 === su2 ? `${v1}/${v2}${su2}` : `${v1}${su1}/${v2}${su2}`;
+    }
+    return d;
+  }
+
+  function formatRingValue(metricKey, rawVal, rawUnit, pct) {
+    if (rawUnit === "%" && pct >= 10 && rawVal.length > 4) {
+      return pct >= 99.95 ? "100" : pct.toFixed(1);
+    }
+    return rawVal || (metricKey === "load" ? "0.00" : "0");
+  }
+
+  function createRingCell() {
+    const cell = document.createElement("div");
+    cell.className = "sao-ring-cell";
+
+    const top = document.createElement("span");
+    top.className = "sao-ring-top";
+    const dot = document.createElement("span");
+    dot.className = "sao-ring-dot";
+    const name = document.createElement("span");
+    name.className = "sao-ring-name";
+    top.append(dot, name);
+
+    const wrap = document.createElement("div");
+    wrap.className = "sao-ring-wrap";
+    const svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("viewBox", "0 0 48 48");
+    svg.setAttribute("aria-hidden", "true");
+    const bg = document.createElementNS(SVG_NS, "circle");
+    bg.setAttribute("class", "sao-ring-bg");
+    bg.setAttribute("cx", "24");
+    bg.setAttribute("cy", "24");
+    bg.setAttribute("r", "19");
+    const fg = document.createElementNS(SVG_NS, "circle");
+    fg.setAttribute("class", "sao-ring-fg");
+    fg.setAttribute("cx", "24");
+    fg.setAttribute("cy", "24");
+    fg.setAttribute("r", "19");
+    fg.setAttribute("stroke-dasharray", String(RING_CIRCUMFERENCE));
+    fg.setAttribute("stroke-dashoffset", String(RING_CIRCUMFERENCE));
+    svg.append(bg, fg);
+
+    const val = document.createElement("span");
+    val.className = "sao-ring-val tabular";
+    const numSpan = document.createElement("span");
+    numSpan.className = "sao-ring-num";
+    const unitSpan = document.createElement("span");
+    unitSpan.className = "sao-ring-unit";
+    val.append(numSpan, unitSpan);
+    wrap.append(svg, val);
+
+    const spec = document.createElement("span");
+    spec.className = "sao-ring-spec tabular";
+
+    cell.append(top, wrap, spec);
+    return cell;
+  }
+
+  function decorateHealthRings() {
+    const grids = document.querySelectorAll(".server-health-grid");
+    for (const grid of grids) {
+      const items = grid.querySelectorAll(":scope > .metric-item");
+      if (items.length === 0) continue;
+
+      let cpuCores = 1;
+      items.forEach((it, idx) => {
+        const head = it.querySelector(":scope > div:first-child");
+        const lbl = head?.querySelector("span.font-medium")?.textContent || "";
+        if (detectHealthMetric(lbl, idx) === "cpu") {
+          const dtEl = it.querySelector(":scope > .metric-detail");
+          const dt = dtEl?.dataset.empty === "true" ? "" : (dtEl?.textContent || "");
+          const cm = dt.match(/(\d+)\s*(?:核|cores?|vcpu)/i);
+          if (cm) cpuCores = Math.max(1, parseInt(cm[1], 10));
+        }
+      });
+
+      items.forEach((item, idx) => {
+        const head = item.querySelector(":scope > div:first-child");
+        const labelEl = head?.querySelector("span.font-medium") || head?.firstElementChild?.querySelector("span:last-child");
+        const valWrap = head?.querySelector(".tabular");
+        const detailEl = item.querySelector(":scope > .metric-detail");
+        if (!labelEl || !valWrap) return;
+
+        const labelText = (labelEl.textContent || "").trim();
+        const metricKey = detectHealthMetric(labelText, idx);
+        const rawVal = (valWrap.querySelector("span:first-child")?.textContent || valWrap.textContent || "").trim();
+        const rawUnit = (valWrap.children.length > 1 ? valWrap.children[1].textContent : "").trim();
+        const rawDetail = (detailEl?.dataset.empty === "true" ? "" : (detailEl?.textContent || "")).replace(/\u00a0/g, "").trim();
+
+        const numVal = parseFloat(rawVal);
+        const safeNum = Number.isFinite(numVal) ? numVal : 0;
+        const rawPct = metricKey === "load" ? (safeNum / cpuCores) * 100 : safeNum;
+        const pct = Math.max(0, Math.min(100, rawPct));
+        const active = pct > 0;
+        const visualPct = active ? Math.max(pct, 2.5) : 0;
+        const offset = active ? +(RING_CIRCUMFERENCE * (1 - visualPct / 100)).toFixed(2) : RING_CIRCUMFERENCE;
+
+        const dispVal = formatRingValue(metricKey, rawVal, rawUnit, pct);
+        const dispSpec = formatRingSpec(metricKey, rawDetail);
+        const sig = `${metricKey}|${labelText}|${dispVal}|${rawUnit}|${dispSpec}|${offset}|${active ? 1 : 0}`;
+
+        if (item.dataset.saoMetric !== metricKey) item.dataset.saoMetric = metricKey;
+        if (!item.classList.contains("has-sao-ring")) item.classList.add("has-sao-ring");
+
+        let cell = item.querySelector(":scope > .sao-ring-cell");
+        if (!cell) {
+          cell = createRingCell();
+          item.appendChild(cell);
+        }
+        if (cell.dataset.sig === sig) return;
+        cell.dataset.sig = sig;
+
+        cell.querySelector(".sao-ring-name").textContent = labelText;
+        cell.querySelector(".sao-ring-num").textContent = dispVal;
+        const unitNode = cell.querySelector(".sao-ring-unit");
+        unitNode.textContent = rawUnit;
+        unitNode.style.display = rawUnit ? "" : "none";
+
+        const fg = cell.querySelector(".sao-ring-fg");
+        fg.setAttribute("stroke-dashoffset", String(offset));
+        fg.style.opacity = active ? "1" : "0";
+
+        const specNode = cell.querySelector(".sao-ring-spec");
+        specNode.textContent = dispSpec;
+        specNode.title = rawDetail || (metricKey === "load" ? "Load 1m" : "");
+      });
+    }
+  }
+
   function decoratePriceChips() {
     const chips = document.querySelectorAll(".dstatus-tags-row:not(.dstatus-tags-measure) .dstatus-price-chip:not(.has-sao-flag)");
     for (const chip of chips) {
@@ -160,6 +319,7 @@
   }
 
   function render() {
+    decorateHealthRings();
     decoratePriceChips();
     const cards = document.querySelectorAll('.server-card, .compact-node-card, .mini-node-card');
     for (const card of cards) {
@@ -203,7 +363,11 @@
   }
 
   let queued = false;
-  new MutationObserver(() => {
+  new MutationObserver((mutations) => {
+    if (mutations.every((m) => {
+      const el = m.target.nodeType === 1 ? m.target : m.target.parentElement;
+      return Boolean(el && el.closest(".sao-ring-cell"));
+    })) return;
     if (!queued) {
       queued = true;
       requestAnimationFrame(() => {
@@ -211,7 +375,7 @@
         render();
       });
     }
-  }).observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+  }).observe(document.getElementById('root') || document.body, { childList: true, subtree: true, characterData: true });
 
   refresh();
   setInterval(refresh, 60000);

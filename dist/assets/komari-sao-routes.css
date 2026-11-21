@@ -514,3 +514,177 @@
     gap: 3px !important;
   }
 }
+
+/* SAO-Havoc Hardware Health Redesign (Option 3: 4-Column Radial Rings) */
+.server-health-grid:has(> .metric-item.has-sao-ring) {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.server-health-grid .metric-item.has-sao-ring {
+  border-radius: 10px !important;
+  padding: 8px 4px !important;
+  background: #f8fafc !important;
+  border: 1px solid rgba(15, 23, 42, 0.06) !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+}
+
+:root[data-appearance="dark"] .server-health-grid .metric-item.has-sao-ring {
+  background: rgba(255, 255, 255, 0.028) !important;
+  border-color: rgba(255, 255, 255, 0.065) !important;
+}
+
+.server-health-grid .metric-item.has-sao-ring > :not(.sao-ring-cell) {
+  display: none !important;
+}
+
+.sao-ring-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-width: 0;
+}
+
+.sao-ring-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 3.5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+}
+
+:root[data-appearance="dark"] .sao-ring-top {
+  color: #d4d4d8;
+}
+
+.sao-ring-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  flex: none;
+}
+
+.metric-item[data-sao-metric="cpu"] .sao-ring-dot { background: #3b82f6; }
+.metric-item[data-sao-metric="ram"] .sao-ring-dot { background: #8b5cf6; }
+.metric-item[data-sao-metric="disk"] .sao-ring-dot { background: #f97316; }
+.metric-item[data-sao-metric="load"] .sao-ring-dot { background: #ec4899; }
+
+.sao-ring-wrap {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.sao-ring-wrap svg {
+  transform: rotate(-90deg);
+  width: 48px;
+  height: 48px;
+  display: block;
+}
+
+.sao-ring-bg {
+  fill: none;
+  stroke: rgba(15, 23, 42, 0.08);
+  stroke-width: 3.6;
+}
+
+:root[data-appearance="dark"] .sao-ring-bg {
+  stroke: rgba(255, 255, 255, 0.1);
+}
+
+.sao-ring-fg {
+  fill: none;
+  stroke-width: 3.6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.35s ease, opacity 0.2s ease;
+}
+
+.metric-item[data-sao-metric="cpu"] .sao-ring-fg { stroke: #3b82f6; }
+.metric-item[data-sao-metric="ram"] .sao-ring-fg { stroke: #8b5cf6; }
+.metric-item[data-sao-metric="disk"] .sao-ring-fg { stroke: #f97316; }
+.metric-item[data-sao-metric="load"] .sao-ring-fg { stroke: #ec4899; }
+
+.sao-ring-val {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+
+:root[data-appearance="dark"] .sao-ring-val {
+  color: #f8fafc;
+}
+
+.sao-ring-unit {
+  font-size: 8.5px;
+  font-weight: 500;
+  margin-left: 1px;
+  opacity: 0.7;
+}
+
+.sao-ring-spec {
+  font-size: 9.5px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  padding: 0 3px;
+  color: #64748b;
+}
+
+:root[data-appearance="dark"] .sao-ring-spec {
+  color: #a1a1aa;
+}
+
+@media (max-width: 440px) {
+  .server-health-grid:has(> .metric-item.has-sao-ring) {
+    gap: 5px !important;
+  }
+  .server-health-grid .metric-item.has-sao-ring {
+    padding: 6px 2px !important;
+    border-radius: 8px !important;
+  }
+  .sao-ring-cell {
+    gap: 4px;
+  }
+  .sao-ring-top {
+    font-size: 9.5px;
+    gap: 3px;
+  }
+  .sao-ring-wrap,
+  .sao-ring-wrap svg {
+    width: 42px;
+    height: 42px;
+  }
+  .sao-ring-val {
+    font-size: 9.5px;
+  }
+  .sao-ring-unit {
+    font-size: 7.5px;
+  }
+  .sao-ring-spec {
+    font-size: 8.5px;
+    padding: 0 2px;
+  }
+}
