@@ -182,6 +182,32 @@
     if (tipEl) tipEl.classList.remove("is-show");
   }
 
+  async function fetchServerTrafficArchive() {
+    try {
+      const res = await fetch("/routes/api?kind=traffic", {
+        credentials: "include",
+        cache: "no-store",
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) return;
+      const payload = await res.json();
+      const days = payload?.days;
+      if (!days || typeof days !== "object") return;
+      const nextMap = { ...dailyMap };
+      for (const [dayKey, vals] of Object.entries(days)) {
+        if (!vals || typeof vals !== "object") continue;
+        const prev = nextMap[dayKey] || { up: 0, down: 0, total: 0 };
+        const up = Math.max(Number(prev.up) || 0, Number(vals.up) || 0);
+        const down = Math.max(Number(prev.down) || 0, Number(vals.down) || 0);
+        const total = Math.max(Number(prev.total) || 0, Number(vals.total) || 0, up + down);
+        nextMap[dayKey] = { up, down, total };
+      }
+      dailyMap = nextMap;
+      saveHistory(dailyMap);
+      renderHeatmapCard();
+    } catch {}
+  }
+
   async function fetchMetrics() {
     if (fetching) return;
     const now = Date.now();
@@ -561,6 +587,7 @@
       if (scroller && scroller.scrollWidth > scroller.clientWidth) {
         scroller.scrollLeft = scroller.scrollWidth;
       }
+      fetchServerTrafficArchive();
       fetchMetrics();
       fetchBackupStatus();
     } else {

@@ -45,7 +45,7 @@
     const isTight = (/[\u4e00-\u9fa5]/.test(displayVal) && displayVal.length >= 4) || displayVal.length >= 5;
     return [
       displayVal,
-      tone + (partial && !stale && meta?.status === 'ok' ? ' is-partial' : '') + (isTight ? ' is-tight' : ''),
+      tone + (isTight ? ' is-tight' : ''),
       `${status}${viaNote}${partialNote}；最近成功：${timeStr}${reasonStr}`
     ];
   }
