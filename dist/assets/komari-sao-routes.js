@@ -144,8 +144,19 @@
     return "us";
   }
 
-  const RING_CIRCUMFERENCE = 119.38;
-  const SVG_NS = "http://www.w3.org/2000/svg";
+  const TILE_ICONS = {
+    cpu: '<svg width="11.5" height="11.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v3M9 2v3M15 19v3M9 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>',
+    ram: '<svg width="11.5" height="11.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19v-3M10 19v-3M14 19v-3M18 19v-3M8 11V9M16 11V9M12 11V9M2 15h20"/><rect width="20" height="10" x="2" y="6" rx="2"/></svg>',
+    disk: '<svg width="11.5" height="11.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>',
+    load: '<svg width="11.5" height="11.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>',
+  };
+
+  const TILE_CAPTIONS = {
+    cpu: "核心规格",
+    ram: "已用",
+    disk: "空间",
+    load: "Load 1m",
+  };
 
   function detectHealthMetric(label, idx) {
     const t = String(label || "").trim().toLowerCase();
@@ -165,74 +176,69 @@
     return u;
   }
 
-  function formatRingSpec(metricKey, detail) {
+  function formatTileSpec(metricKey, detail, numVal, cpuCores) {
+    if (metricKey === "load") {
+      const ratio = numVal / Math.max(1, cpuCores);
+      if (ratio < 0.7) return "空闲平稳";
+      if (ratio <= 1.2) return "中等负载";
+      return "高负载";
+    }
     const d = String(detail || "").trim();
-    if (!d) return metricKey === "load" ? "1m 均值" : "\u00A0";
+    if (!d) return "\u00A0";
     const m = d.match(/^([\d.]+)\s*(TB|GB|MB|KB|B)\s*\/\s*([\d.]+)\s*(TB|GB|MB|KB|B)$/i);
     if (m) {
       const [, v1, u1, v2, u2] = m;
-      const su1 = shortUnit(u1);
-      const su2 = shortUnit(u2);
-      return su1 === su2 ? `${v1}/${v2}${su2}` : `${v1}${su1}/${v2}${su2}`;
+      const up1 = u1.toUpperCase();
+      const up2 = u2.toUpperCase();
+      return up1 === up2 ? `${v1} / ${v2} ${up2}` : `${v1}${shortUnit(u1)} / ${v2}${shortUnit(u2)}`;
     }
     return d;
   }
 
-  function formatRingValue(metricKey, rawVal, rawUnit, pct) {
-    if (rawUnit === "%" && pct >= 10 && rawVal.length > 4) {
-      return pct >= 99.95 ? "100" : pct.toFixed(1);
-    }
-    return rawVal || (metricKey === "load" ? "0.00" : "0");
-  }
-
-  function createRingCell() {
+  function createTileCell() {
     const cell = document.createElement("div");
-    cell.className = "sao-ring-cell";
+    cell.className = "sao-tile-cell";
 
-    const top = document.createElement("span");
-    top.className = "sao-ring-top";
-    const dot = document.createElement("span");
-    dot.className = "sao-ring-dot";
+    const head = document.createElement("div");
+    head.className = "sao-tile-head";
+
+    const left = document.createElement("span");
+    left.className = "sao-tile-left";
+    const chip = document.createElement("span");
+    chip.className = "sao-tile-chip";
     const name = document.createElement("span");
-    name.className = "sao-ring-name";
-    top.append(dot, name);
-
-    const wrap = document.createElement("div");
-    wrap.className = "sao-ring-wrap";
-    const svg = document.createElementNS(SVG_NS, "svg");
-    svg.setAttribute("viewBox", "0 0 48 48");
-    svg.setAttribute("aria-hidden", "true");
-    const bg = document.createElementNS(SVG_NS, "circle");
-    bg.setAttribute("class", "sao-ring-bg");
-    bg.setAttribute("cx", "24");
-    bg.setAttribute("cy", "24");
-    bg.setAttribute("r", "19");
-    const fg = document.createElementNS(SVG_NS, "circle");
-    fg.setAttribute("class", "sao-ring-fg");
-    fg.setAttribute("cx", "24");
-    fg.setAttribute("cy", "24");
-    fg.setAttribute("r", "19");
-    fg.setAttribute("stroke-dasharray", String(RING_CIRCUMFERENCE));
-    fg.setAttribute("stroke-dashoffset", String(RING_CIRCUMFERENCE));
-    svg.append(bg, fg);
+    name.className = "sao-tile-name";
+    left.append(chip, name);
 
     const val = document.createElement("span");
-    val.className = "sao-ring-val tabular";
+    val.className = "sao-tile-val tabular";
     const numSpan = document.createElement("span");
-    numSpan.className = "sao-ring-num";
+    numSpan.className = "sao-tile-num";
     const unitSpan = document.createElement("span");
-    unitSpan.className = "sao-ring-unit";
+    unitSpan.className = "sao-tile-unit";
     val.append(numSpan, unitSpan);
-    wrap.append(svg, val);
 
-    const spec = document.createElement("span");
-    spec.className = "sao-ring-spec tabular";
+    head.append(left, val);
 
-    cell.append(top, wrap, spec);
+    const track = document.createElement("div");
+    track.className = "sao-tile-track";
+    const fill = document.createElement("div");
+    fill.className = "sao-tile-fill";
+    track.appendChild(fill);
+
+    const foot = document.createElement("div");
+    foot.className = "sao-tile-foot";
+    const subK = document.createElement("span");
+    subK.className = "sao-tile-sub-k";
+    const subV = document.createElement("span");
+    subV.className = "sao-tile-sub-v tabular";
+    foot.append(subK, subV);
+
+    cell.append(head, track, foot);
     return cell;
   }
 
-  function decorateHealthRings() {
+  function decorateHealthTiles() {
     const grids = document.querySelectorAll(".server-metric-grid");
     for (const grid of grids) {
       const items = grid.querySelectorAll(":scope > .metric-item");
@@ -267,38 +273,43 @@
         const safeNum = Number.isFinite(numVal) ? numVal : 0;
         const rawPct = metricKey === "load" ? (safeNum / cpuCores) * 100 : safeNum;
         const pct = Math.max(0, Math.min(100, rawPct));
-        const active = pct > 0;
-        const visualPct = active ? Math.max(pct, 2.5) : 0;
-        const offset = active ? +(RING_CIRCUMFERENCE * (1 - visualPct / 100)).toFixed(2) : RING_CIRCUMFERENCE;
+        const fillPct = pct <= 0 ? 0 : +(Math.min(100, Math.max(pct, 3.5))).toFixed(2);
 
-        const dispVal = formatRingValue(metricKey, rawVal, rawUnit, pct);
-        const dispSpec = formatRingSpec(metricKey, rawDetail);
-        const sig = `${metricKey}|${labelText}|${dispVal}|${rawUnit}|${dispSpec}|${offset}|${active ? 1 : 0}`;
+        const dispVal = rawVal || (metricKey === "load" ? "0.00" : "0");
+        const caption = TILE_CAPTIONS[metricKey] || "";
+        const specVal = formatTileSpec(metricKey, rawDetail, safeNum, cpuCores);
+        const sig = `${metricKey}|${labelText}|${dispVal}|${rawUnit}|${fillPct}|${specVal}`;
 
         if (item.dataset.saoMetric !== metricKey) item.dataset.saoMetric = metricKey;
-        if (!item.classList.contains("has-sao-ring")) item.classList.add("has-sao-ring");
+        if (!item.classList.contains("has-sao-tile")) item.classList.add("has-sao-tile");
+        item.classList.remove("has-sao-ring");
 
-        let cell = item.querySelector(":scope > .sao-ring-cell");
+        let cell = item.querySelector(":scope > .sao-tile-cell");
         if (!cell) {
-          cell = createRingCell();
+          cell = createTileCell();
           item.appendChild(cell);
         }
         if (cell.dataset.sig === sig) return;
         cell.dataset.sig = sig;
 
-        cell.querySelector(".sao-ring-name").textContent = labelText;
-        cell.querySelector(".sao-ring-num").textContent = dispVal;
-        const unitNode = cell.querySelector(".sao-ring-unit");
+        const chip = cell.querySelector(".sao-tile-chip");
+        if (chip.dataset.iconKey !== metricKey) {
+          chip.dataset.iconKey = metricKey;
+          chip.innerHTML = TILE_ICONS[metricKey] || TILE_ICONS.cpu;
+        }
+        cell.querySelector(".sao-tile-name").textContent = labelText;
+        cell.querySelector(".sao-tile-num").textContent = dispVal;
+
+        const unitNode = cell.querySelector(".sao-tile-unit");
         unitNode.textContent = rawUnit;
         unitNode.style.display = rawUnit ? "" : "none";
 
-        const fg = cell.querySelector(".sao-ring-fg");
-        fg.setAttribute("stroke-dashoffset", String(offset));
-        fg.style.opacity = active ? "1" : "0";
+        cell.querySelector(".sao-tile-fill").style.width = `${fillPct}%`;
+        cell.querySelector(".sao-tile-sub-k").textContent = caption;
 
-        const specNode = cell.querySelector(".sao-ring-spec");
-        specNode.textContent = dispSpec;
-        specNode.title = rawDetail || (metricKey === "load" ? "Load 1m" : "");
+        const subV = cell.querySelector(".sao-tile-sub-v");
+        subV.textContent = specVal;
+        cell.querySelector(".sao-tile-foot").title = rawDetail || (metricKey === "load" ? `Load 1m: ${dispVal} (${cpuCores} 核)` : "");
       });
     }
   }
@@ -319,7 +330,7 @@
   }
 
   function render() {
-    decorateHealthRings();
+    decorateHealthTiles();
     decoratePriceChips();
     const cards = document.querySelectorAll('.server-card, .compact-node-card, .mini-node-card');
     for (const card of cards) {
@@ -366,7 +377,7 @@
   new MutationObserver((mutations) => {
     if (mutations.every((m) => {
       const el = m.target.nodeType === 1 ? m.target : m.target.parentElement;
-      return Boolean(el && el.closest(".sao-ring-cell"));
+      return Boolean(el && el.closest(".sao-tile-cell"));
     })) return;
     if (!queued) {
       queued = true;
