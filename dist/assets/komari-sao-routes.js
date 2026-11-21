@@ -233,7 +233,7 @@
   }
 
   function decorateHealthRings() {
-    const grids = document.querySelectorAll(".server-health-grid");
+    const grids = document.querySelectorAll(".server-metric-grid");
     for (const grid of grids) {
       const items = grid.querySelectorAll(":scope > .metric-item");
       if (items.length === 0) continue;

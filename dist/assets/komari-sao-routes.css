@@ -516,13 +516,13 @@
 }
 
 /* SAO-Havoc Hardware Health Redesign (Option 3: 4-Column Radial Rings) */
-.server-health-grid:has(> .metric-item.has-sao-ring) {
+.server-metric-grid:has(> .metric-item.has-sao-ring) {
   display: grid !important;
   grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
   gap: 8px !important;
 }
 
-.server-health-grid .metric-item.has-sao-ring {
+.server-metric-grid .metric-item.has-sao-ring {
   border-radius: 10px !important;
   padding: 8px 4px !important;
   background: #f8fafc !important;
@@ -535,12 +535,12 @@
   gap: 0 !important;
 }
 
-:root[data-appearance="dark"] .server-health-grid .metric-item.has-sao-ring {
+:root[data-appearance="dark"] .server-metric-grid .metric-item.has-sao-ring {
   background: rgba(255, 255, 255, 0.028) !important;
   border-color: rgba(255, 255, 255, 0.065) !important;
 }
 
-.server-health-grid .metric-item.has-sao-ring > :not(.sao-ring-cell) {
+.server-metric-grid .metric-item.has-sao-ring > :not(.sao-ring-cell) {
   display: none !important;
 }
 
@@ -658,10 +658,10 @@
 }
 
 @media (max-width: 440px) {
-  .server-health-grid:has(> .metric-item.has-sao-ring) {
+  .server-metric-grid:has(> .metric-item.has-sao-ring) {
     gap: 5px !important;
   }
-  .server-health-grid .metric-item.has-sao-ring {
+  .server-metric-grid .metric-item.has-sao-ring {
     padding: 6px 2px !important;
     border-radius: 8px !important;
   }
