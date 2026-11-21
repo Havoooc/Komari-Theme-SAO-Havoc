@@ -100,6 +100,7 @@
             const yesterdayQueryHours = Math.max(24, Math.ceil(yesterdayElapsedMs / (60 * 60 * 1000)));
 
             window.__EARLY_DATA__ = {
+              routes_all: fetch(base + "/routes/api?kind=all", { credentials: "include", cache: "no-store", headers }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
               public: fetch(base + "/api/public", opts).then((r) => (r.ok ? r.json() : null)).catch(() => null),
               me: fetch(base + "/api/me", opts).then((r) => (r.ok ? r.json() : null)).catch(() => null),
               nodes: fetch(base + "/api/nodes", opts).then((r) => (r.ok ? r.json() : null)).catch(() => null),
@@ -228,9 +229,9 @@
     <link rel="stylesheet" crossorigin href="/assets/charts-CnsZ1jie.css">
     <link rel="stylesheet" crossorigin href="/assets/index-Ol0RXH63.css">
     <link rel="stylesheet" href="/assets/komari-sao-routes.css?v=20261121-13">
-    <script defer src="/assets/komari-sao-routes.js?v=20261121-10"></script>
+    <script defer src="/assets/komari-sao-routes.js?v=20261121-11"></script>
       <link rel="stylesheet" href="/assets/komari-sao-heatmap.css?v=20261116-1">
-    <script defer src="/assets/komari-sao-heatmap.js?v=20261121-2"></script>
+    <script defer src="/assets/komari-sao-heatmap.js?v=20261121-3"></script>
   </head>
   <body>
     <div id="root" class="relative z-30"></div>

@@ -527,21 +527,43 @@
     }
   }
 
-  async function refresh() {
-    try {
-      const res = await fetch('/routes/api', { credentials: 'same-origin', cache: 'no-store' });
-      routeData = res.ok ? await res.json() : {};
-    } catch {
-      routeData = {};
+  let lastFetchTs = 0;
+  let initialConsumed = false;
+
+  async function refresh(force = false) {
+    if (!force && document.hidden) return;
+    const now = Date.now();
+    if (!force && lastFetchTs > 0 && now - lastFetchTs < 60000) {
+      render();
+      return;
     }
+    try {
+      if (!initialConsumed && window.__EARLY_DATA__?.routes_all) {
+        initialConsumed = true;
+        const early = await window.__EARLY_DATA__.routes_all;
+        if (early && typeof early.routes === "object") {
+          routeData = early.routes;
+          lastFetchTs = Date.now();
+          render();
+          return;
+        }
+      }
+      initialConsumed = true;
+      const res = await fetch('/routes/api', { credentials: 'same-origin', cache: 'no-store' });
+      if (res.ok) {
+        routeData = await res.json();
+        lastFetchTs = Date.now();
+      }
+    } catch {}
     render();
   }
 
   let queued = false;
   new MutationObserver((mutations) => {
+    if (document.hidden) return;
     if (mutations.every((m) => {
       const el = m.target.nodeType === 1 ? m.target : m.target.parentElement;
-      return Boolean(el && (el.closest(".sao-tile-cell") || el.closest(".sao-net-console") || el.closest(".sao-mob-head-bill")));
+      return Boolean(el && (el.closest(".sao-tile-cell") || el.closest(".sao-net-console") || el.closest(".sao-mob-head-bill") || el.closest(".sao-hm-card")));
     })) return;
     if (!queued) {
       queued = true;
@@ -552,6 +574,10 @@
     }
   }).observe(document.getElementById('root') || document.body, { childList: true, subtree: true, characterData: true });
 
-  refresh();
-  setInterval(refresh, 60000);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) refresh(false);
+  });
+
+  refresh(true);
+  setInterval(() => refresh(false), 180000);
 })();

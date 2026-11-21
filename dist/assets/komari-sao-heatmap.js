@@ -171,57 +171,58 @@
     if (tipEl) tipEl.classList.remove("is-show");
   }
 
-  async function fetchServerTrafficArchive() {
-    const now = Date.now();
-    if (now - lastTrafficFetchTs < 60_000) return;
-    lastTrafficFetchTs = now;
-    try {
-      const res = await fetch("/routes/api?kind=traffic", {
-        credentials: "include",
-        cache: "no-store",
-        headers: { Accept: "application/json" },
-      });
-      if (!res.ok) return;
-      const payload = await res.json();
-      const days = payload?.days;
-      if (!days || typeof days !== "object") return;
-      const nextMap = { ...dailyMap };
-      let changed = false;
-      for (const [dayKey, vals] of Object.entries(days)) {
-        if (!vals || typeof vals !== "object") continue;
-        const prev = nextMap[dayKey] || { up: 0, down: 0, total: 0 };
-        const up = Math.max(Number(prev.up) || 0, Number(vals.up) || 0);
-        const down = Math.max(Number(prev.down) || 0, Number(vals.down) || 0);
-        const total = Math.max(Number(prev.total) || 0, Number(vals.total) || 0, up + down);
-        if (up !== prev.up || down !== prev.down || total !== prev.total) {
-          nextMap[dayKey] = { up, down, total };
-          changed = true;
-        }
+  let earlyHeatmapConsumed = false;
+
+  function applyTrafficArchiveDays(days) {
+    if (!days || typeof days !== "object") return false;
+    const nextMap = { ...dailyMap };
+    let changed = false;
+    for (const [dayKey, vals] of Object.entries(days)) {
+      if (!vals || typeof vals !== "object") continue;
+      const prev = nextMap[dayKey] || { up: 0, down: 0, total: 0 };
+      const up = Math.max(Number(prev.up) || 0, Number(vals.up) || 0);
+      const down = Math.max(Number(prev.down) || 0, Number(vals.down) || 0);
+      const total = Math.max(Number(prev.total) || 0, Number(vals.total) || 0, up + down);
+      if (up !== prev.up || down !== prev.down || total !== prev.total) {
+        nextMap[dayKey] = { up, down, total };
+        changed = true;
       }
-      if (changed) {
-        dailyMap = nextMap;
-        saveHistory(dailyMap);
-        renderHeatmapCard();
-      }
-    } catch {}
+    }
+    if (changed) {
+      dailyMap = nextMap;
+      saveHistory(dailyMap);
+    }
+    return changed;
   }
 
-  async function fetchBackupStatus() {
+  async function fetchHeatmapRemoteData(force = false) {
+    if (!force && document.hidden) return;
     const now = Date.now();
-    if (now - lastBackupFetchTs < 60_000) return;
+    if (!force && now - lastTrafficFetchTs < 60_000) return;
+    lastTrafficFetchTs = now;
     lastBackupFetchTs = now;
     try {
-      const res = await fetch("/routes/api?kind=backup", {
-        credentials: "include",
-        cache: "no-store",
-        headers: { Accept: "application/json" },
-      });
-      if (!res.ok) return;
-      const json = await res.json();
-      if (json && typeof json === "object") {
-        backupData = json;
-        renderHeatmapCard();
+      let combined = null;
+      if (!earlyHeatmapConsumed && window.__EARLY_DATA__?.routes_all) {
+        earlyHeatmapConsumed = true;
+        combined = await window.__EARLY_DATA__.routes_all;
+      } else {
+        earlyHeatmapConsumed = true;
+        const res = await fetch("/routes/api?kind=all", {
+          credentials: "include",
+          cache: "no-store",
+          headers: { Accept: "application/json" },
+        });
+        if (res.ok) combined = await res.json();
       }
+      if (!combined || typeof combined !== "object") return;
+      let shouldRender = false;
+      if (applyTrafficArchiveDays(combined.traffic?.days)) shouldRender = true;
+      if (combined.backup && typeof combined.backup === "object") {
+        backupData = combined.backup;
+        shouldRender = true;
+      }
+      if (shouldRender) renderHeatmapCard();
     } catch {}
   }
 
@@ -499,14 +500,14 @@
   }
 
   function mountIfNeeded() {
+    if (document.hidden) return;
     const heroMain = document.querySelector(".mao-dashboard-hero .mao-hero-main");
     if (!heroMain) return;
     if (!heroMain.querySelector(".sao-hm-card")) {
       const card = createHeatmapCard();
       heroMain.appendChild(card);
       renderHeatmapCard();
-      fetchServerTrafficArchive();
-      fetchBackupStatus();
+      fetchHeatmapRemoteData(true);
     } else {
       const now = Date.now();
       if (now - lastDomSyncTs >= 10000) {
@@ -518,7 +519,12 @@
 
   function init() {
     mountIfNeeded();
-    const obs = new MutationObserver(() => {
+    const obs = new MutationObserver((mutations) => {
+      if (document.hidden) return;
+      if (mutations.every((m) => {
+        const el = m.target.nodeType === 1 ? m.target : m.target.parentElement;
+        return Boolean(el && (el.closest(".sao-hm-card") || el.closest(".sao-tile-cell") || el.closest(".sao-net-console")));
+      })) return;
       mountIfNeeded();
     });
     const root = document.getElementById("root") || document.body;
@@ -526,13 +532,17 @@
 
     document.addEventListener("click", hideTooltip);
     window.addEventListener("scroll", hideTooltip, true);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && document.querySelector(".sao-hm-card")) {
+        fetchHeatmapRemoteData(false);
+      }
+    });
 
     setInterval(() => {
-      if (document.querySelector(".sao-hm-card")) {
-        fetchServerTrafficArchive();
-        fetchBackupStatus();
+      if (!document.hidden && document.querySelector(".sao-hm-card")) {
+        fetchHeatmapRemoteData(false);
       }
-    }, 120_000);
+    }, 180_000);
   }
 
   if (document.readyState === "loading") {
