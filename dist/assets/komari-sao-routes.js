@@ -238,36 +238,51 @@
     return cell;
   }
 
+  function extractHealthItemInfo(item, idx) {
+    if (item.classList.contains("compact-node-gauge")) {
+      const labelText = (item.querySelector(".compact-node-gauge-label > span:last-child")?.textContent || "").trim();
+      const metricKey = detectHealthMetric(labelText, idx);
+      const strongText = (item.querySelector(".compact-node-gauge-head > strong")?.textContent || "").trim();
+      const hasPct = strongText.endsWith("%");
+      const rawVal = hasPct ? strongText.slice(0, -1).trim() : strongText;
+      const rawUnit = hasPct ? "%" : "";
+      const titleAttr = item.getAttribute("title") || "";
+      const parts = titleAttr.split(" · ");
+      const rawDetail = parts.length > 1 ? parts.slice(1).join(" · ").trim() : "";
+      return { labelText, metricKey, rawVal, rawUnit, rawDetail };
+    }
+    const head = item.querySelector(":scope > div:first-child");
+    const labelEl = head?.querySelector("span.font-medium") || head?.firstElementChild?.querySelector("span:last-child");
+    const valWrap = head?.querySelector(".tabular");
+    const detailEl = item.querySelector(":scope > .metric-detail");
+    if (!labelEl || !valWrap) return null;
+    const labelText = (labelEl.textContent || "").trim();
+    const metricKey = detectHealthMetric(labelText, idx);
+    const rawVal = (valWrap.querySelector("span:first-child")?.textContent || valWrap.textContent || "").trim();
+    const rawUnit = (valWrap.children.length > 1 ? valWrap.children[1].textContent : "").trim();
+    const rawDetail = (detailEl?.dataset.empty === "true" ? "" : (detailEl?.textContent || "")).replace(/\u00a0/g, "").trim();
+    return { labelText, metricKey, rawVal, rawUnit, rawDetail };
+  }
+
   function decorateHealthTiles() {
-    const grids = document.querySelectorAll(".server-metric-grid");
+    const grids = document.querySelectorAll(".server-metric-grid, .compact-node-vitals");
     for (const grid of grids) {
-      const items = grid.querySelectorAll(":scope > .metric-item");
+      const items = grid.querySelectorAll(":scope > .metric-item, :scope > .compact-node-gauge");
       if (items.length === 0) continue;
 
       let cpuCores = 1;
       items.forEach((it, idx) => {
-        const head = it.querySelector(":scope > div:first-child");
-        const lbl = head?.querySelector("span.font-medium")?.textContent || "";
-        if (detectHealthMetric(lbl, idx) === "cpu") {
-          const dtEl = it.querySelector(":scope > .metric-detail");
-          const dt = dtEl?.dataset.empty === "true" ? "" : (dtEl?.textContent || "");
-          const cm = dt.match(/(\d+)\s*(?:核|cores?|vcpu)/i);
+        const info = extractHealthItemInfo(it, idx);
+        if (info && info.metricKey === "cpu") {
+          const cm = info.rawDetail.match(/(\d+)\s*(?:核|cores?|vcpu)/i);
           if (cm) cpuCores = Math.max(1, parseInt(cm[1], 10));
         }
       });
 
       items.forEach((item, idx) => {
-        const head = item.querySelector(":scope > div:first-child");
-        const labelEl = head?.querySelector("span.font-medium") || head?.firstElementChild?.querySelector("span:last-child");
-        const valWrap = head?.querySelector(".tabular");
-        const detailEl = item.querySelector(":scope > .metric-detail");
-        if (!labelEl || !valWrap) return;
-
-        const labelText = (labelEl.textContent || "").trim();
-        const metricKey = detectHealthMetric(labelText, idx);
-        const rawVal = (valWrap.querySelector("span:first-child")?.textContent || valWrap.textContent || "").trim();
-        const rawUnit = (valWrap.children.length > 1 ? valWrap.children[1].textContent : "").trim();
-        const rawDetail = (detailEl?.dataset.empty === "true" ? "" : (detailEl?.textContent || "")).replace(/\u00a0/g, "").trim();
+        const info = extractHealthItemInfo(item, idx);
+        if (!info) return;
+        const { labelText, metricKey, rawVal, rawUnit, rawDetail } = info;
 
         const numVal = parseFloat(rawVal);
         const safeNum = Number.isFinite(numVal) ? numVal : 0;

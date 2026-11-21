@@ -507,14 +507,16 @@
   }
 }
 
-/* SAO-Havoc Hardware Health Redesign (Option 1: 2x2 Frosted Micro-Tile Cockpit) */
-.server-metric-grid:has(> .metric-item.has-sao-tile) {
+/* SAO-Havoc Hardware Health Redesign (Option 1: 2x2 Frosted Micro-Tile Cockpit — Desktop & Mobile Unified) */
+.server-metric-grid:has(> .metric-item.has-sao-tile),
+.compact-node-vitals:has(> .compact-node-gauge.has-sao-tile) {
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 8px !important;
 }
 
-.server-metric-grid .metric-item.has-sao-tile {
+.server-metric-grid .metric-item.has-sao-tile,
+.compact-node-vitals .compact-node-gauge.has-sao-tile {
   border-radius: 10px !important;
   padding: 8.5px 10.5px !important;
   background: #f8fafc !important;
@@ -528,13 +530,15 @@
   gap: 0 !important;
 }
 
-:root[data-appearance="dark"] .server-metric-grid .metric-item.has-sao-tile {
+:root[data-appearance="dark"] .server-metric-grid .metric-item.has-sao-tile,
+:root[data-appearance="dark"] .compact-node-vitals .compact-node-gauge.has-sao-tile {
   background: rgba(255, 255, 255, 0.032) !important;
   border-color: rgba(255, 255, 255, 0.075) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
 }
 
-.server-metric-grid .metric-item.has-sao-tile > :not(.sao-tile-cell) {
+.server-metric-grid .metric-item.has-sao-tile > :not(.sao-tile-cell),
+.compact-node-vitals .compact-node-gauge.has-sao-tile > :not(.sao-tile-cell) {
   display: none !important;
 }
 
@@ -578,38 +582,38 @@
   flex: none;
 }
 
-.metric-item[data-sao-metric="cpu"] .sao-tile-chip {
+[data-sao-metric="cpu"] .sao-tile-chip {
   background: rgba(59, 130, 246, 0.12);
   color: #2563eb;
 }
-:root[data-appearance="dark"] .metric-item[data-sao-metric="cpu"] .sao-tile-chip {
+:root[data-appearance="dark"] [data-sao-metric="cpu"] .sao-tile-chip {
   background: rgba(96, 165, 250, 0.15);
   color: #60a5fa;
 }
 
-.metric-item[data-sao-metric="ram"] .sao-tile-chip {
+[data-sao-metric="ram"] .sao-tile-chip {
   background: rgba(139, 92, 246, 0.12);
   color: #7c3aed;
 }
-:root[data-appearance="dark"] .metric-item[data-sao-metric="ram"] .sao-tile-chip {
+:root[data-appearance="dark"] [data-sao-metric="ram"] .sao-tile-chip {
   background: rgba(167, 139, 250, 0.15);
   color: #a78bfa;
 }
 
-.metric-item[data-sao-metric="disk"] .sao-tile-chip {
+[data-sao-metric="disk"] .sao-tile-chip {
   background: rgba(249, 115, 22, 0.12);
   color: #ea580c;
 }
-:root[data-appearance="dark"] .metric-item[data-sao-metric="disk"] .sao-tile-chip {
+:root[data-appearance="dark"] [data-sao-metric="disk"] .sao-tile-chip {
   background: rgba(251, 146, 60, 0.15);
   color: #fb923c;
 }
 
-.metric-item[data-sao-metric="load"] .sao-tile-chip {
+[data-sao-metric="load"] .sao-tile-chip {
   background: rgba(236, 72, 153, 0.12);
   color: #db2777;
 }
-:root[data-appearance="dark"] .metric-item[data-sao-metric="load"] .sao-tile-chip {
+:root[data-appearance="dark"] [data-sao-metric="load"] .sao-tile-chip {
   background: rgba(244, 114, 182, 0.15);
   color: #f472b6;
 }
@@ -652,15 +656,15 @@
   transition: width 0.35s ease;
 }
 
-.metric-item[data-sao-metric="cpu"] .sao-tile-fill { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
-.metric-item[data-sao-metric="ram"] .sao-tile-fill { background: linear-gradient(90deg, #a78bfa, #7c3aed); }
-.metric-item[data-sao-metric="disk"] .sao-tile-fill { background: linear-gradient(90deg, #fb923c, #ea580c); }
-.metric-item[data-sao-metric="load"] .sao-tile-fill { background: linear-gradient(90deg, #f472b6, #db2777); }
+[data-sao-metric="cpu"] .sao-tile-fill { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+[data-sao-metric="ram"] .sao-tile-fill { background: linear-gradient(90deg, #a78bfa, #7c3aed); }
+[data-sao-metric="disk"] .sao-tile-fill { background: linear-gradient(90deg, #fb923c, #ea580c); }
+[data-sao-metric="load"] .sao-tile-fill { background: linear-gradient(90deg, #f472b6, #db2777); }
 
-:root[data-appearance="dark"] .metric-item[data-sao-metric="cpu"] .sao-tile-fill { box-shadow: 0 0 8px rgba(59, 130, 246, 0.45); }
-:root[data-appearance="dark"] .metric-item[data-sao-metric="ram"] .sao-tile-fill { box-shadow: 0 0 8px rgba(139, 92, 246, 0.45); }
-:root[data-appearance="dark"] .metric-item[data-sao-metric="disk"] .sao-tile-fill { box-shadow: 0 0 8px rgba(249, 115, 22, 0.45); }
-:root[data-appearance="dark"] .metric-item[data-sao-metric="load"] .sao-tile-fill { box-shadow: 0 0 8px rgba(236, 72, 153, 0.4); }
+:root[data-appearance="dark"] [data-sao-metric="cpu"] .sao-tile-fill { box-shadow: 0 0 8px rgba(59, 130, 246, 0.45); }
+:root[data-appearance="dark"] [data-sao-metric="ram"] .sao-tile-fill { box-shadow: 0 0 8px rgba(139, 92, 246, 0.45); }
+:root[data-appearance="dark"] [data-sao-metric="disk"] .sao-tile-fill { box-shadow: 0 0 8px rgba(249, 115, 22, 0.45); }
+:root[data-appearance="dark"] [data-sao-metric="load"] .sao-tile-fill { box-shadow: 0 0 8px rgba(236, 72, 153, 0.4); }
 
 .sao-tile-foot {
   display: flex;
@@ -697,10 +701,12 @@
 }
 
 @media (max-width: 440px) {
-  .server-metric-grid:has(> .metric-item.has-sao-tile) {
+  .server-metric-grid:has(> .metric-item.has-sao-tile),
+  .compact-node-vitals:has(> .compact-node-gauge.has-sao-tile) {
     gap: 6px !important;
   }
-  .server-metric-grid .metric-item.has-sao-tile {
+  .server-metric-grid .metric-item.has-sao-tile,
+  .compact-node-vitals .compact-node-gauge.has-sao-tile {
     padding: 7px 8.5px !important;
     border-radius: 9px !important;
   }
@@ -734,6 +740,10 @@
   justify-content: space-between !important;
   gap: 6px !important;
   flex-wrap: wrap !important;
+  max-height: none !important;
+  min-height: 24px !important;
+  height: auto !important;
+  overflow: visible !important;
 }
 
 .sao-mob-head-bill {
@@ -914,18 +924,61 @@
   color: #e4e4e7;
 }
 
-/* Fix Dark Mode Progress/Traffic Track Disappearing on Hover / iOS Touch */
+@media (max-width: 380px) {
+  .sao-mob-net-dual {
+    gap: 6px !important;
+  }
+  .sao-mob-net-box {
+    padding: 5.5px 7.5px;
+  }
+  .sao-mob-net-tag {
+    font-size: 10px;
+  }
+  .sao-mob-net-spd {
+    font-size: 13px;
+  }
+  .sao-mob-up-u,
+  .sao-mob-dn-u {
+    font-size: 9px;
+  }
+  .sao-mob-net-r2 {
+    font-size: 9.5px;
+  }
+  .sao-mob-head-bill {
+    gap: 4px;
+  }
+  .sao-mob-exp-pill,
+  .sao-mob-price-pill {
+    padding: 1.5px 5.5px;
+    font-size: 9.5px;
+  }
+}
+
+/* Fix Dark Mode Progress/Traffic Track Contrast & Touch Sticky Hover + Offline Desaturation */
 :root[data-appearance="dark"] {
-  --progress-bg: #323238 !important;
+  --progress-bg: #35353c !important;
 }
 
 :root[data-appearance="dark"] .server-card:hover,
 :root[data-appearance="dark"] .compact-node-card:hover,
 :root[data-appearance="dark"] .mini-node-card:hover {
+  background: #222226 !important;
   --progress-bg: #3f3f46 !important;
 }
 
 @media (hover: none) {
+  .server-card:hover,
+  .compact-node-card:hover,
+  .mini-node-card:hover {
+    transform: none !important;
+  }
+  :root:not([data-appearance="dark"]) .server-card:hover,
+  :root:not([data-appearance="dark"]) .compact-node-card:hover,
+  :root:not([data-appearance="dark"]) .mini-node-card:hover {
+    background: var(--surface, #ffffff) !important;
+    border-color: rgba(24, 24, 27, 0.08) !important;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+  }
   :root[data-appearance="dark"] .server-card:hover,
   :root[data-appearance="dark"] .compact-node-card:hover,
   :root[data-appearance="dark"] .mini-node-card:hover {
@@ -933,4 +986,14 @@
     border-color: rgba(255, 255, 255, 0.08) !important;
     box-shadow: none !important;
   }
+}
+
+.server-card.is-offline .sao-tile-cell,
+.compact-node-card.is-offline .sao-tile-cell,
+.server-card.is-offline .server-traffic-section .traffic-stat,
+.compact-node-card.is-offline .sao-mob-net-dual,
+.compact-node-card.is-offline .sao-mob-head-bill,
+.server-card.is-offline .dstatus-price-chip.has-sao-flag {
+  filter: saturate(0.28);
+  opacity: 0.72;
 }
